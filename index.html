@@ -4,10 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LACRIMOSA.xyz — TV en Vivo</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6085190373776711" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-<style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://image.tmdb.org">
+<link rel="dns-prefetch" href="https://api.themoviedb.org">
+<link rel="dns-prefetch" href="https://www.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all';this.onload=null">
+<!-- hls.js removido: no se usa en el código --><style>
 /* ═══════════════════════════════════════════════════════
    NETFLIX-STYLE UI
    ═══════════════════════════════════════════════════════ */
@@ -472,11 +475,11 @@ footer a:hover{color:var(--text);text-decoration:underline;}
 .ep-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 8px 24px var(--glow);}
 .ep-card.active{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent),0 6px 20px var(--glow);}
 .ep-still{
-  width:110px;min-height:62px;flex-shrink:0;
+  width:110px;aspect-ratio:16/9;flex-shrink:0;
   background:var(--card2);object-fit:cover;display:block;
 }
 .ep-still-fb{
-  width:110px;min-height:62px;flex-shrink:0;
+  width:110px;aspect-ratio:16/9;flex-shrink:0;
   background:var(--card2);display:flex;align-items:center;
   justify-content:center;font-size:1.2rem;
 }
@@ -506,7 +509,7 @@ footer a:hover{color:var(--text);text-decoration:underline;}
 @media(max-width:640px){
   #episodesSection{padding:.7rem 1rem 1.5rem;}
   .ep-grid{grid-template-columns:1fr;}
-  .ep-still,.ep-still-fb{width:90px;min-height:51px;}
+  .ep-still,.ep-still-fb{width:90px;}
 }
 
 /* ── USER / AUTH ── */
@@ -1051,7 +1054,7 @@ footer a:hover{color:var(--text);text-decoration:underline;}
 .ad-container{
   display:flex;align-items:center;justify-content:center;
   position:relative;margin:1.2rem auto;
-  min-height:250px;
+  height:250px;
   background:rgba(255,255,255,.015);
   border:1px solid var(--border);
   border-radius:var(--radius);
@@ -1379,9 +1382,8 @@ footer a:hover{color:var(--text);text-decoration:underline;}
   <!-- AD BANNER INSIDE PLAYER (se oculta/muestra con el player) -->
   <div class="ad-container ad-rect" id="adPlayerBanner" style="margin:0 auto 1rem;max-width:320px;">
     <div class="ad-label">Publicidad</div>
-    <div id="adPlayerContent" style="width:300px;min-height:250px;display:flex;align-items:center;justify-content:center;">
-      <script>atOptions={key:"e299121ca2a19f13e181e9f918364f4f",format:"iframe",height:250,width:300,params:{}};</script>
-      <script src="https://www.highperformanceformat.com/e299121ca2a19f13e181e9f918364f4f/invoke.js"></script>
+    <div id="adPlayerContent" data-ad-slot="player" style="width:300px;height:250px;display:flex;align-items:center;justify-content:center;">
+      <!-- Ad cargado dinámicamente -->
     </div>
   </div>
 </div>
@@ -1530,7 +1532,7 @@ footer a:hover{color:var(--text);text-decoration:underline;}
 <div class="series-modal-bg" id="seriesModal" onclick="closeSeriesModal(event)">
   <div class="series-modal">
     <div class="series-modal-hero">
-      <img id="seriesModalHero" src="" alt="">
+      <img id="seriesModalHero" src="" alt="" width="1280" height="720" fetchpriority="high">
       <div class="series-modal-grad"></div>
       <button class="series-modal-close" onclick="closeSeriesModalDirect()">✕</button>
     </div>
@@ -1563,7 +1565,7 @@ footer a:hover{color:var(--text);text-decoration:underline;}
 <div class="movie-modal-bg" id="movieModal" onclick="closeMovieModal(event)">
   <div class="movie-modal">
     <div class="movie-modal-hero">
-      <img id="movieModalHero" src="" alt="">
+      <img id="movieModalHero" src="" alt="" width="1280" height="720" fetchpriority="high">
       <div class="movie-modal-grad"></div>
       <button class="movie-modal-close" onclick="closeMovieModalDirect()">✕</button>
     </div>
@@ -1795,11 +1797,10 @@ footer a:hover{color:var(--text);text-decoration:underline;}
 
 <!-- FLOATING AD (desktop) -->
 <div class="ad-float" id="adFloat">
-  <button class="ad-float-close" onclick="document.getElementById('adFloat').classList.remove('visible')" title="Cerrar">✕</button>
+  <button class="ad-float-close" onclick="document.getElementById('adFloat').classList.remove('visible');adFloatClosed=true" title="Cerrar">✕</button>
   <div class="ad-label">Publicidad</div>
-  <div id="adFloatContent" style="width:300px;min-height:250px;display:flex;align-items:center;justify-content:center;">
-    <script>atOptions={key:"e299121ca2a19f13e181e9f918364f4f",format:"iframe",height:250,width:300,params:{}};</script>
-    <script src="https://www.highperformanceformat.com/e299121ca2a19f13e181e9f918364f4f/invoke.js"></script>
+  <div id="adFloatContent" data-ad-slot="float" style="width:300px;height:250px;display:flex;align-items:center;justify-content:center;">
+    <!-- Ad cargado dinámicamente -->
   </div>
 </div>
 
@@ -1872,6 +1873,7 @@ function initFirebase() {
 const TMDB_KEY  = '8265bd1679663a7ea12ac168da84d2e8'; // public demo key, low rate limit
 const TMDB_BASE = 'https://api.themoviedb.org/3';
 const TMDB_IMG  = 'https://image.tmdb.org/t/p/';
+function tmdbImg(size, path) { return TMDB_IMG + size + path + '?format=webp'; }
 // Embedders in priority order: {label, fn(tmdbId,season,ep), noLang?}
 const SERIES_SOURCES = [
   { label:'UnlimPlay',  fn:(id,s,e)=>`https://unlimplay.com/play/embed/tv/${id}/${s}/${e}` },
@@ -1948,7 +1950,7 @@ async function fetchSeries(reset) {
       card.style.animationDelay = (i*0.02)+'s';
       card.style.position = 'relative';
       card.onclick = () => openSeriesModal(tv);
-      const poster = tv.poster_path ? `${TMDB_IMG}w342${tv.poster_path}` : '';
+      const poster = tv.poster_path ? tmdbImg('w342', tv.poster_path) : '';
       const score  = tv.vote_average ? '⭐ '+tv.vote_average.toFixed(1) : '';
       const year   = (tv.first_air_date||'').slice(0,4);
       card.innerHTML = `
@@ -1983,8 +1985,8 @@ async function openSeriesModal(tv) {
   } catch(e) {}
 
   const hero = currentSeries.backdrop_path
-    ? `${TMDB_IMG}w1280${currentSeries.backdrop_path}`
-    : (currentSeries.poster_path ? `${TMDB_IMG}w780${currentSeries.poster_path}` : '');
+    ? tmdbImg('w1280', currentSeries.backdrop_path)
+    : (currentSeries.poster_path ? tmdbImg('w780', currentSeries.poster_path) : '');
 
   document.getElementById('seriesModalHero').src = hero;
   document.getElementById('seriesModalTitle').textContent = currentSeries.name||'';
@@ -2264,7 +2266,7 @@ async function renderEpisodes(seasonNum) {
     card.onclick = () => selectEpisode(seasonNum, ep.episode_number);
 
     const still = ep.still_path
-      ? `<img class="ep-still" src="${TMDB_IMG}w300${ep.still_path}" alt="Ep ${ep.episode_number}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="ep-still-fb" style="display:none">📺</div>`
+      ? `<img class="ep-still" src="${tmdbImg('w300', ep.still_path)}" alt="Ep ${ep.episode_number}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="ep-still-fb" style="display:none">📺</div>`
       : '<div class="ep-still-fb">📺</div>';
 
     const runtime = ep.runtime ? ep.runtime + ' min' : '';
@@ -2372,7 +2374,7 @@ async function fetchMovies(reset) {
       card.style.animationDelay = (i*0.02)+'s';
       card.style.position = 'relative';
       card.onclick = () => openMovieModal(m);
-      const poster = m.poster_path ? `${TMDB_IMG}w342${m.poster_path}` : '';
+      const poster = m.poster_path ? tmdbImg('w342', m.poster_path) : '';
       const score  = m.vote_average ? '⭐ '+m.vote_average.toFixed(1) : '';
       const year   = (m.release_date||'').slice(0,4);
       card.innerHTML = `
@@ -2399,7 +2401,7 @@ function moviesNextPage() { moviePage++; fetchMovies(false); }
 // ── MODAL ─────────────────────────────────────────────
 function openMovieModal(m) { moviePage = moviePage; /* keep */
   currentMovie = m;
-  const hero = m.backdrop_path ? `${TMDB_IMG}w1280${m.backdrop_path}` : (m.poster_path ? `${TMDB_IMG}w780${m.poster_path}` : '');
+  const hero = m.backdrop_path ? tmdbImg('w1280', m.backdrop_path) : (m.poster_path ? tmdbImg('w780', m.poster_path) : '');
   document.getElementById('movieModalHero').src = hero;
   document.getElementById('movieModalTitle').textContent = m.title||'';
   document.getElementById('movieModalSub').textContent = [
@@ -2584,7 +2586,7 @@ function renderContinueWatchingSeries() {
 
   continueWatchingSeries.forEach(function(item) {
     var poster = item.posterPath
-      ? 'https://image.tmdb.org/t/p/w342' + item.posterPath
+      ? tmdbImg('w342', item.posterPath)
       : '';
     var epInfo = item.seasonNum ? 'T' + item.seasonNum + ' · EP' + item.epNum : '';
     var epLabel = item.epName || ('Episodio ' + (item.epNum || '?'));
@@ -2641,7 +2643,7 @@ function renderContinueWatchingMovies() {
 
   continueWatchingMovies.forEach(function(item) {
     var poster = item.posterPath
-      ? 'https://image.tmdb.org/t/p/w342' + item.posterPath
+      ? tmdbImg('w342', item.posterPath)
       : '';
 
     var card = document.createElement('div');
@@ -2757,11 +2759,19 @@ window['__onGCastApiAvailable'] = function(isAvailable) {
       document.getElementById('castBtn').style.display = '';
     }
   } catch(e) {}
+  // Reintentar cast si estaba pendiente
+  if (window._castPending) { window._castPending = false; setTimeout(function(){ startCast(); }, 500); }
 };
 
 function startCast() {
-  if (!castAvailable) {
-    alert('Chromecast no disponible. Usa Chrome y asegúrate de tener dispositivos en la red.');
+  // Cargar SDK bajo demanda si no está disponible aún
+  if (!window.cast || !castAvailable) {
+    if (!document.querySelector('script[src*="cast_sender.js"]')) {
+      var script = document.createElement('script');
+      script.src = 'https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1';
+      document.head.appendChild(script);
+      window._castPending = true;
+    }
     return;
   }
   try {
@@ -3293,7 +3303,7 @@ async function renderWatchlistGrid() {
     entries.forEach(function(e, i) {
       var d = fullData[e.docId];
       if (!d) return;
-      var poster = d.posterPath ? 'https://image.tmdb.org/t/p/w342' + d.posterPath : '';
+      var poster = d.posterPath ? tmdbImg('w342', d.posterPath) : '';
       var card = document.createElement('div');
       card.className = 'wl-card';
       card.style.animationDelay = (i*0.02)+'s';
@@ -3600,7 +3610,7 @@ async function renderHistoryGrid() {
   grid.innerHTML = '';
 
   entries.forEach(function(d, i) {
-    var poster = d.posterPath ? 'https://image.tmdb.org/t/p/w342' + d.posterPath : '';
+    var poster = d.posterPath ? tmdbImg('w342', d.posterPath) : '';
     var card = document.createElement('div');
     card.className = 'wl-card';
     card.style.animationDelay = (i*0.02)+'s';
@@ -4351,7 +4361,15 @@ async function loadHeroSection(type) {
 
     if (bgEl) {
       var bgPath = item.backdrop_path || item.poster_path || '';
-      if (bgPath) bgEl.style.backgroundImage = 'url(' + TMDB_IMG + 'w1280' + bgPath + ')';
+      if (bgPath) {
+        var preloadLink = document.createElement('link');
+        preloadLink.rel = 'preload';
+        preloadLink.as = 'image';
+        preloadLink.href = tmdbImg('w1280', bgPath);
+        preloadLink.fetchpriority = 'high';
+        document.head.appendChild(preloadLink);
+        bgEl.style.backgroundImage = 'url(' + tmdbImg('w1280', bgPath) + ')';
+      }
     }
     if (titleEl) titleEl.textContent = item.name || item.title || '—';
     if (metaEl) {
@@ -4464,7 +4482,7 @@ async function fetchAnime(reset) {
       card.style.animationDelay = (i * 0.02) + 's';
       card.style.position = 'relative';
       card.onclick = function() { openSeriesModal(tv); };
-      var poster = tv.poster_path ? TMDB_IMG + 'w342' + tv.poster_path : '';
+      var poster = tv.poster_path ? tmdbImg('w342', tv.poster_path) : '';
       var score = tv.vote_average ? '⭐ ' + tv.vote_average.toFixed(1) : '';
       var year = (tv.first_air_date || '').slice(0, 4);
       card.innerHTML =
@@ -4549,7 +4567,7 @@ async function fetchDocs(reset) {
       card.style.animationDelay = (i * 0.02) + 's';
       card.style.position = 'relative';
       card.onclick = function() { openMovieModal(m); };
-      var poster = m.poster_path ? TMDB_IMG + 'w342' + m.poster_path : '';
+      var poster = m.poster_path ? tmdbImg('w342', m.poster_path) : '';
       var score = m.vote_average ? '⭐ ' + m.vote_average.toFixed(1) : '';
       var year = (m.release_date || '').slice(0, 4);
       card.innerHTML =
@@ -4576,16 +4594,49 @@ function docsNextPage() { docsPage++; fetchDocs(false); }
 var adsLoaded = false;
 var adFloatClosed = false;
 
+function injectAdSlot(slotId, key, timeoutMs) {
+  var container = document.getElementById(slotId);
+  if (!container) return;
+
+  // Inyectar script de configuración
+  var cfgScript = document.createElement('script');
+  cfgScript.textContent = 'atOptions={key:"' + key + '",format:"iframe",height:250,width:300,params:{}};';
+  container.appendChild(cfgScript);
+
+  // Inyectar script del ad network (async para no bloquear)
+  var adScript = document.createElement('script');
+  adScript.src = 'https://www.highperformanceformat.com/' + key + '/invoke.js';
+  adScript.async = true;
+  container.appendChild(adScript);
+
+  // Timeout: si el iframe no aparece en X segundos, ocultar contenedor
+  setTimeout(function() {
+    var hasIframe = container.querySelector('iframe');
+    if (!hasIframe) {
+      var adContainer = container.closest('.ad-container, .ad-float');
+      if (adContainer) adContainer.style.display = 'none';
+    }
+  }, timeoutMs || 5000);
+}
+
 function loadAds() {
   if (adsLoaded) return;
   adsLoaded = true;
-  // Floating ad — mostrar después de 5s solo en desktop
+
+  // Banner del player: cargar con 2s de retraso para priorizar la UI
+  setTimeout(function() {
+    injectAdSlot('adPlayerContent', 'e299121ca2a19f13e181e9f918364f4f', 5000);
+  }, 2000);
+
+  // Floating ad: mostrar después de 8s solo en desktop
   setTimeout(function() {
     if (adFloatClosed || window.innerWidth <= 768) return;
     var adFloat = document.getElementById('adFloat');
-    if (adFloat) adFloat.classList.add('visible');
-  }, 5000);
-  // El banner del player está dentro de #mediaPlayerSection → se muestra/oculta solo
+    if (adFloat) {
+      adFloat.classList.add('visible');
+      injectAdSlot('adFloatContent', 'e299121ca2a19f13e181e9f918364f4f', 5000);
+    }
+  }, 8000);
 }
 
 // ═══════════════════════════════════════════════════════
@@ -4721,11 +4772,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 </script>
-<script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
+<!-- Cast SDK cargado bajo demanda en startCast() -->
 
-<!-- POPUNDER AD -->
-<script src="https://pl29686460.effectivecpmnetwork.com/0a/48/eb/0a48ebf1380c05b3b5be03221c1dcd13.js"></script>
-<!-- MOBILE BOTTOM NAVIGATION -->
+<!-- AD UNIT (carga diferida) -->
+<script>
+(function(){
+  var s = document.createElement('script');
+  s.src = 'https://www.effectivecpmnetwork.com/az5gvu02?key=c83b10cd75f89bd249dac344b3993f05';
+  s.async = true;
+  document.head.appendChild(s);
+})();
+</script><!-- MOBILE BOTTOM NAVIGATION -->
 <nav class="mobile-bottom-nav" id="mobileBottomNav">
   <button class="mb-nav-btn active" data-target="series">
     <span class="mb-nav-icon">📺</span>
