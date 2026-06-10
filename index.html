@@ -107,7 +107,7 @@ header{
   display:flex;align-items:center;gap:0;
   border-bottom:2px solid var(--border);
   background:transparent;
-  overflow-x:auto;scrollbar-width:none;
+  overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;
   position:sticky;top:118px;z-index:198;
   padding:0 4%;
 }
@@ -1161,17 +1161,19 @@ footer a:hover{color:var(--text);text-decoration:underline;}
   .header-right{gap:.4rem;}
   .total-badge{font-size:.65rem;display:none;}
 
-  /* Tighter cat bar */
-  .cat-bar{top:50px;gap:0;overflow-x:auto;scrollbar-width:none;justify-content:flex-start;padding:0 2%;}
-  .cat-bar::-webkit-scrollbar{display:none;}
-  .cat-main-tab{font-size:.7rem;padding:.5rem .8rem;flex:0 0 auto;}
+  /* Tighter cat bar — scroll horizontal Android+iOS */
+  .cat-bar{top:50px;gap:.25rem;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch;justify-content:flex-start;padding:.3rem 2%;flex-wrap:nowrap;-ms-overflow-style:none;}
+  .cat-bar::-webkit-scrollbar{display:none;width:0;height:0;}
+  .cat-main-tab{font-size:.78rem;padding:.5rem 1rem;flex:0 0 auto;border-radius:6px;white-space:nowrap;}
+  .cat-emoji{display:none;}
 
   /* Search bar compact */
   .search-bar{padding:.45rem 3%;}
   #globalSearch{font-size:.74rem;padding:.45rem 4.2rem .45rem 2.2rem;}
 
   /* Source bar compact */
-  .source-bar{top:100px;padding:0 2%;}
+  .source-bar{top:100px;padding:0 2%;overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;}
+  .source-bar::-webkit-scrollbar{display:none;width:0;height:0;}
   .src-tab{font-size:.65rem;padding:.4rem .7rem;}
 
   /* Controls compact */
@@ -1181,11 +1183,10 @@ footer a:hover{color:var(--text);text-decoration:underline;}
 
   /* Grid adjustments */
   .series-grid,.movies-grid,.wl-grid,.anime-grid{
-    grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.45rem;padding:0 2% 2rem;
+    grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.6rem;padding:0 3% 2rem;
   }
-  .aw-top-grid{grid-template-columns:1fr;padding:0 2%;}
-  .aw-card{width:140px;}
-  .series-card:hover,.movie-card:hover,.wl-card:hover{transform:scale(1.03);}
+  .series-card:hover,.movie-card:hover,.wl-card:hover{transform:none;}
+  .series-poster,.movie-poster,.wl-poster,.anime-poster{aspect-ratio:2/3;object-fit:cover;}
 
   /* Row headers */
   .row-header{padding:.5rem 2% .3rem;}
@@ -1330,11 +1331,11 @@ footer a:hover{color:var(--text);text-decoration:underline;}
 
 <!-- CATEGORY TABS -->
 <div class="cat-bar">
-  <button class="cat-main-tab active" id="catSeries" onclick="switchCategory('series')">📺 SERIES</button>
-  <button class="cat-main-tab" id="catMovies" onclick="switchCategory('movies')">🎬 PELÍCULAS</button>
-  <button class="cat-main-tab" id="catAnime" onclick="switchCategory('anime')">🌸 ANIME</button>
-  <button class="cat-main-tab" id="catDocs" onclick="switchCategory('docs')">🎥 DOCUMENTALES</button>
-  <button class="cat-main-tab" id="catLive" onclick="switchCategory('live')">📡 EN VIVO</button>
+  <button class="cat-main-tab active" id="catSeries" onclick="switchCategory('series')"><span class="cat-emoji">📺 </span>SERIES</button>
+  <button class="cat-main-tab" id="catMovies" onclick="switchCategory('movies')"><span class="cat-emoji">🎬 </span>PELÍCULAS</button>
+  <button class="cat-main-tab" id="catAnime" onclick="switchCategory('anime')"><span class="cat-emoji">🌸 </span>ANIME</button>
+  <button class="cat-main-tab" id="catDocs" onclick="switchCategory('docs')"><span class="cat-emoji">🎥 </span>DOCS</button>
+  <button class="cat-main-tab" id="catLive" onclick="switchCategory('live')"><span class="cat-emoji">📡 </span>EN VIVO</button>
 </div>
 
 <!-- MEDIA PLAYER -->
@@ -4683,8 +4684,12 @@ function initMobileNav() {
 
   var btns = nav.querySelectorAll('.mb-nav-btn');
   btns.forEach(function(btn) {
-    btn.addEventListener('click', function() {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
       var target = this.getAttribute('data-target');
+      if (!target) return;
+      // Ya está activo, no hacer nada
+      if (this.classList.contains('active')) return;
       btns.forEach(function(b) { b.classList.remove('active'); });
       this.classList.add('active');
       if (target === 'series') switchCategory('series');
@@ -4692,11 +4697,8 @@ function initMobileNav() {
       else if (target === 'anime') switchCategory('anime');
       else if (target === 'live') switchCategory('live');
       else if (target === 'profile') {
-        if (currentUser) {
-          toggleUserDropdown();
-        } else {
-          openAuthModal();
-        }
+        if (currentUser) { toggleUserDropdown(); }
+        else { openAuthModal(); }
       }
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
@@ -4731,7 +4733,7 @@ document.addEventListener('DOMContentLoaded', function() {
   </button>
   <button class="mb-nav-btn" data-target="movies">
     <span class="mb-nav-icon">🎬</span>
-    <span class="mb-nav-label">Películas</span>
+    <span class="mb-nav-label">Movies</span>
   </button>
   <button class="mb-nav-btn" data-target="anime">
     <span class="mb-nav-icon">🌸</span>
@@ -4739,7 +4741,7 @@ document.addEventListener('DOMContentLoaded', function() {
   </button>
   <button class="mb-nav-btn" data-target="live">
     <span class="mb-nav-icon">📡</span>
-    <span class="mb-nav-label">En Vivo</span>
+    <span class="mb-nav-label">Vivo</span>
   </button>
   <button class="mb-nav-btn" data-target="profile">
     <span class="mb-nav-icon">👤</span>
