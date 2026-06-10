@@ -9,7 +9,8 @@
 <link rel="preconnect" href="https://image.tmdb.org">
 <link rel="dns-prefetch" href="https://api.themoviedb.org">
 <link rel="dns-prefetch" href="https://www.gstatic.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all';this.onload=null">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="preload" as="style" onload="this.rel='stylesheet';this.onload=null">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"></noscript>
 <!-- hls.js removido: no se usa en el código --><style>
 /* ═══════════════════════════════════════════════════════
    NETFLIX-STYLE UI
@@ -1819,27 +1820,29 @@ let db = null;
 let currentUser = null;
 let authMode = 'login';
 
-// Cargar Firebase dinámicamente (no bloquea la página si falla)
+// Cargar Firebase dinámicamente con retraso (no compite con LCP)
 (function loadFirebase() {
-  var scripts = [
-    'https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js',
-    'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js',
-    'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js'
-  ];
-  var loaded = 0;
-  scripts.forEach(function(src) {
-    var s = document.createElement('script');
-    s.src = src;
-    s.onload = function() {
-      loaded++;
-      if (loaded === scripts.length) initFirebase();
-    };
-    s.onerror = function() {
-      console.warn('No se pudo cargar Firebase. La app funciona sin login.');
-      updateUserUI(null);
-    };
-    document.head.appendChild(s);
-  });
+  setTimeout(function() {
+    var scripts = [
+      'https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js',
+      'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js',
+      'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js'
+    ];
+    var loaded = 0;
+    scripts.forEach(function(src) {
+      var s = document.createElement('script');
+      s.src = src;
+      s.onload = function() {
+        loaded++;
+        if (loaded === scripts.length) initFirebase();
+      };
+      s.onerror = function() {
+        console.warn('No se pudo cargar Firebase. La app funciona sin login.');
+        updateUserUI(null);
+      };
+      document.head.appendChild(s);
+    });
+  }, 2000);
 })();
 
 function initFirebase() {
@@ -2727,8 +2730,11 @@ async function loadSeriesModalAndPlay(tmdbId, seasonNum, epNum) {
 document.addEventListener('DOMContentLoaded', ()=>{
   seriesPage = 1;
   switchCategory('series');
+  // ⏳ Solo cargar contenido visible primero — lo demás se posterga
   loadSeries('popular', document.querySelector('#seriesTabs .series-tab'));
-  loadContinueWatching();
+  // Postergar hero + continue watching (no bloquean el primer render)
+  setTimeout(function(){ loadHeroSection('series'); }, 1500);
+  setTimeout(function(){ loadContinueWatching(); }, 2000);
 });
 
 // ═══════════════════════════════════════════════════════
@@ -3833,12 +3839,18 @@ async function fetchLiveCategories() {
   var proxyBase = getLiveProxyBase();
   if (proxyBase) urls.push(proxyBase + '/live-categories');
   urls.push(LIVE_CATEGORIES_URL);
+  // CORS proxies públicos (ordenados por confiabilidad)
+  urls.push('https://api.allorigins.win/raw?url=' + encodeURIComponent(LIVE_CATEGORIES_URL));
   urls.push('https://corsproxy.io/?' + encodeURIComponent(LIVE_CATEGORIES_URL));
+  urls.push('https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(LIVE_CATEGORIES_URL));
+  urls.push('https://thingproxy.freeboard.io/fetch/' + encodeURIComponent(LIVE_CATEGORIES_URL));
 
   for (var i = 0; i < urls.length; i++) {
     try {
-      var res = await fetch(urls[i]);
-      liveCategories = await res.json();
+      var res = await fetch(urls[i], { cache: 'no-cache' });
+      if (!res.ok) continue;
+      var text = await res.text();
+      liveCategories = JSON.parse(text);
       return;
     } catch(e) {}
   }
@@ -3861,14 +3873,19 @@ async function fetchLiveEvents() {
   var proxyBase = getLiveProxyBase();
   if (proxyBase) urls.push(proxyBase + '/live-events');
   urls.push(LIVE_EVENTS_URL);
+  // CORS proxies públicos (ordenados por confiabilidad)
+  urls.push('https://api.allorigins.win/raw?url=' + encodeURIComponent(LIVE_EVENTS_URL));
   urls.push('https://corsproxy.io/?' + encodeURIComponent(LIVE_EVENTS_URL));
   urls.push('https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(LIVE_EVENTS_URL));
+  urls.push('https://thingproxy.freeboard.io/fetch/' + encodeURIComponent(LIVE_EVENTS_URL));
 
   var success = false;
   for (var i = 0; i < urls.length; i++) {
     try {
-      var res = await fetch(urls[i]);
-      liveEvents = await res.json();
+      var res = await fetch(urls[i], { cache: 'no-cache' });
+      if (!res.ok) continue;
+      var text = await res.text();
+      liveEvents = JSON.parse(text);
       success = true;
       break;
     } catch(e) {}
@@ -4213,26 +4230,27 @@ document.addEventListener('DOMContentLoaded', function() {
   } catch(e) {}
 });
 
-// ── INIT AUTH ON LOAD ──
+// ── INIT AUTH ON LOAD (diferido 4s — evita que el iframe de auth bloquee el LCP) ──
 document.addEventListener('DOMContentLoaded', function() {
-  initAuth();
-  // Cargar watchlist cache si ya hay sesión
-  if (auth && auth.currentUser) {
-    currentUser = auth.currentUser;
-    updateUserUI(currentUser);
-    loadWatchlistCache();
-  }
-  // Recuperar historial de localStorage si no hay sesión activa
-  if (!auth || !auth.currentUser) {
-    var localHistory = getHistoryFromLocal();
-    if (localHistory.length > 0) {
-      // Mostrar badge con cantidad de items locales
-      var badge = document.getElementById('totalBadge');
-      if (badge && !auth.currentUser) {
-        // Solo informativo, no modifica el badge principal
+  setTimeout(function() {
+    initAuth();
+    // Cargar watchlist cache si ya hay sesión
+    if (auth && auth.currentUser) {
+      currentUser = auth.currentUser;
+      updateUserUI(currentUser);
+      loadWatchlistCache();
+    }
+    // Recuperar historial de localStorage si no hay sesión activa
+    if (!auth || !auth.currentUser) {
+      var localHistory = getHistoryFromLocal();
+      if (localHistory.length > 0) {
+        var badge = document.getElementById('totalBadge');
+        if (badge && !auth.currentUser) {
+          // Solo informativo, no modifica el badge principal
+        }
       }
     }
-  }
+  }, 4000);
 });
 
 // ── AUTO-GUARDADO al cerrar/recargar la página ──
