@@ -3827,34 +3827,48 @@ const LIVE_EVENTS_URL = 'https://canchatv.online/res/json/eventos_unificados.jso
 const LIVE_CATEGORIES_URL = 'https://canchatv.online/res/json/categorias.json';
 let liveCategories = {};
 
+// Proxy interno de Cloudflare Pages (/_worker.js)
+// Si no usas Cloudflare Pages, cambia por tu propio endpoint
+const LIVE_PROXY = '/proxy';
+
 // Detect if local proxy is available
 function getLiveProxyBase() {
   return (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
     ? 'http://localhost:3000' : null;
 }
 
-// Fetch de categorías (para logos e info)
-async function fetchLiveCategories() {
+async function liveFetchJSON(targetUrl) {
   var urls = [];
   var proxyBase = getLiveProxyBase();
-  if (proxyBase) urls.push(proxyBase + '/live-categories');
-  urls.push(LIVE_CATEGORIES_URL);
-  // CORS proxies públicos (ordenados por confiabilidad)
-  urls.push('https://api.allorigins.win/raw?url=' + encodeURIComponent(LIVE_CATEGORIES_URL));
-  urls.push('https://corsproxy.io/?' + encodeURIComponent(LIVE_CATEGORIES_URL));
-  urls.push('https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(LIVE_CATEGORIES_URL));
-  urls.push('https://thingproxy.freeboard.io/fetch/' + encodeURIComponent(LIVE_CATEGORIES_URL));
+
+  // 1. Proxy local (solo desarrollo)
+  if (proxyBase) {
+    urls.push(proxyBase + '/live-events');
+    urls.push(proxyBase + '/live-categories');
+  }
+
+  // 2. Worker de Cloudflare Pages (automático con _worker.js)
+  urls.push(LIVE_PROXY + '?url=' + encodeURIComponent(targetUrl));
+
+  // 3. Proxies públicos de último recurso
+  urls.push('https://corsproxy.io/?' + encodeURIComponent(targetUrl));
+  urls.push('https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(targetUrl));
 
   for (var i = 0; i < urls.length; i++) {
     try {
       var res = await fetch(urls[i], { cache: 'no-cache' });
       if (!res.ok) continue;
       var text = await res.text();
-      liveCategories = JSON.parse(text);
-      return;
+      return JSON.parse(text);
     } catch(e) {}
   }
-  liveCategories = {};
+  return null;
+}
+
+// Fetch de categorías (para logos e info)
+async function fetchLiveCategories() {
+  var data = await liveFetchJSON(LIVE_CATEGORIES_URL);
+  liveCategories = data || {};
 }
 
 // Fetch de eventos
@@ -3869,27 +3883,9 @@ async function fetchLiveEvents() {
   document.getElementById('liveLoading').style.display = 'flex';
   document.getElementById('liveEmpty').style.display = 'none';
 
-  var urls = [];
-  var proxyBase = getLiveProxyBase();
-  if (proxyBase) urls.push(proxyBase + '/live-events');
-  urls.push(LIVE_EVENTS_URL);
-  // CORS proxies públicos (ordenados por confiabilidad)
-  urls.push('https://api.allorigins.win/raw?url=' + encodeURIComponent(LIVE_EVENTS_URL));
-  urls.push('https://corsproxy.io/?' + encodeURIComponent(LIVE_EVENTS_URL));
-  urls.push('https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(LIVE_EVENTS_URL));
-  urls.push('https://thingproxy.freeboard.io/fetch/' + encodeURIComponent(LIVE_EVENTS_URL));
-
-  var success = false;
-  for (var i = 0; i < urls.length; i++) {
-    try {
-      var res = await fetch(urls[i], { cache: 'no-cache' });
-      if (!res.ok) continue;
-      var text = await res.text();
-      liveEvents = JSON.parse(text);
-      success = true;
-      break;
-    } catch(e) {}
-  }
+  var data = await liveFetchJSON(LIVE_EVENTS_URL);
+  var success = !!data;
+  if (success) liveEvents = data;
 
   liveLoading = false;
   document.getElementById('liveLoading').style.display = 'none';
