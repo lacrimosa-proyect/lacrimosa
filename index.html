@@ -4091,18 +4091,18 @@ function playLiveStream(uuid, channelIdx) {
   frame.src = 'about:blank';
   document.getElementById('mediaSrcRow').style.display = 'none';
   // Token para evitar audio fantasma si se cierra antes de cargar
-  var token = ++_mediaLoadToken;
-  setTimeout(function() {
-    if (token !== _mediaLoadToken) return;
-    var f = document.getElementById('mediaFrame');
-    if (!f || !document.getElementById('mediaPlayerSection').classList.contains('visible')) return;
-    f.src = iframeUrl;
-    f.style.display = 'block';
-    ph.style.display = 'none';
-  }, 300);
+  // Abrir stream en pestaña nueva (los servidores bloquean iframe desde dominios externos)
+  window.open(iframeUrl, '_blank');
+  // También mostrar en el reproductor por si acaso
+  var frame = document.getElementById('mediaFrame');
+  var ph = document.getElementById('mediaPlaceholder');
+  ph.style.display = 'none';
+  frame.src = iframeUrl;
+  frame.style.display = 'block';
+  document.getElementById('mediaSpill').textContent = '🔴 ABIERTO EN PESTAÑA NUEVA';
+  document.getElementById('mediaSpill').className = 'spill live';
   document.getElementById('mediaPlayerSection').classList.add('visible');
   document.getElementById('episodesSection').classList.remove('visible');
-  document.getElementById('mediaPlayerSection').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 // ═══════════════════════════════════════════════════════
