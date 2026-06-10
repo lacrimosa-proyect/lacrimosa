@@ -3884,14 +3884,22 @@ async function fetchLiveEvents() {
   document.getElementById('liveEmpty').style.display = 'none';
 
   var data = await liveFetchJSON(LIVE_EVENTS_URL);
-  var success = !!data;
-  if (success) liveEvents = data;
+  // Soporta tanto array directo como objeto con array dentro
+  if (Array.isArray(data)) {
+    liveEvents = data;
+  } else if (data && Array.isArray(data.eventos || data.events || data.data || data.results)) {
+    liveEvents = data.eventos || data.events || data.data || data.results;
+  } else if (data && Array.isArray(data)) {
+    liveEvents = data;
+  } else {
+    liveEvents = [];
+  }
+  var success = liveEvents.length > 0;
 
   liveLoading = false;
   document.getElementById('liveLoading').style.display = 'none';
   if (!success) {
-    liveEvents = [];
-    console.warn('No se pudo cargar eventos. Corre el proxy local: node proxy.js');
+    console.warn('Eventos: respuesta recibida pero sin eventos. Tipo:', typeof data, 'Keys:', data ? Object.keys(data).slice(0,5).join(',') : 'null');
   }
   renderLiveGrid();
 }
