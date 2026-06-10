@@ -4073,8 +4073,7 @@ function playLiveStream(uuid, channelIdx) {
   if (!evento || !evento.canales || !evento.canales[channelIdx]) return;
   _currentLiveEvent = evento;
   var canal = evento.canales[channelIdx];
-  // Pasar por proxy Deno para quitar X-Frame-Options y permitir embed
-  var iframeUrl = LIVE_PROXY + '?url=' + encodeURIComponent(canal.iframe);
+  var iframeUrl = canal.iframe;
   mediaType = 'live';
   mediaCurSrc = 0;
   var equipos = evento.equipos || {};
@@ -4159,7 +4158,7 @@ function initMVSlots() {
     html += data.html;
     html += '<button class="mv-slot-close" onclick="closeMVSlot(' + i + ')">✕</button>';
     if (hasStream) {
-      html += '<iframe src="' + LIVE_PROXY + '?url=' + encodeURIComponent(hasStream.iframeUrl) + '" allowfullscreen allow="autoplay; fullscreen" style="width:100%;height:100%;border:none;display:block;"></iframe>';
+      html += '<iframe src="' + hasStream.iframeUrl + '" allowfullscreen allow="autoplay; fullscreen" style="width:100%;height:100%;border:none;display:block;"></iframe>';
       html += '<div class="mv-label">🔴 LIVE</div>';
     } else {
       html += '<div class="mv-slot-placeholder">📡<br><span style="font-size:.6rem;">Stream ' + (i + 1) + '</span></div>';
