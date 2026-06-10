@@ -4073,7 +4073,8 @@ function playLiveStream(uuid, channelIdx) {
   if (!evento || !evento.canales || !evento.canales[channelIdx]) return;
   _currentLiveEvent = evento;
   var canal = evento.canales[channelIdx];
-  var iframeUrl = canal.iframe;
+  // Pasar por proxy Deno para quitar X-Frame-Options y permitir embed
+  var iframeUrl = LIVE_PROXY + '?url=' + encodeURIComponent(canal.iframe);
   mediaType = 'live';
   mediaCurSrc = 0;
   var equipos = evento.equipos || {};
@@ -4086,23 +4087,13 @@ function playLiveStream(uuid, channelIdx) {
   document.getElementById('mediaSpill').className = 'spill live';
   var frame = document.getElementById('mediaFrame');
   var ph = document.getElementById('mediaPlaceholder');
-  ph.style.display = 'flex';
-  frame.style.display = 'none';
-  frame.src = 'about:blank';
   document.getElementById('mediaSrcRow').style.display = 'none';
-  // Token para evitar audio fantasma si se cierra antes de cargar
-  // Abrir stream en pestaña nueva (los servidores bloquean iframe desde dominios externos)
-  window.open(iframeUrl, '_blank');
-  // También mostrar en el reproductor por si acaso
-  var frame = document.getElementById('mediaFrame');
-  var ph = document.getElementById('mediaPlaceholder');
-  ph.style.display = 'none';
   frame.src = iframeUrl;
+  ph.style.display = 'none';
   frame.style.display = 'block';
-  document.getElementById('mediaSpill').textContent = '🔴 ABIERTO EN PESTAÑA NUEVA';
-  document.getElementById('mediaSpill').className = 'spill live';
   document.getElementById('mediaPlayerSection').classList.add('visible');
   document.getElementById('episodesSection').classList.remove('visible');
+  document.getElementById('mediaPlayerSection').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 // ═══════════════════════════════════════════════════════
@@ -4168,7 +4159,7 @@ function initMVSlots() {
     html += data.html;
     html += '<button class="mv-slot-close" onclick="closeMVSlot(' + i + ')">✕</button>';
     if (hasStream) {
-      html += '<iframe src="' + hasStream.iframeUrl + '" allowfullscreen allow="autoplay; fullscreen" style="width:100%;height:100%;border:none;display:block;"></iframe>';
+      html += '<iframe src="' + LIVE_PROXY + '?url=' + encodeURIComponent(hasStream.iframeUrl) + '" allowfullscreen allow="autoplay; fullscreen" style="width:100%;height:100%;border:none;display:block;"></iframe>';
       html += '<div class="mv-label">🔴 LIVE</div>';
     } else {
       html += '<div class="mv-slot-placeholder">📡<br><span style="font-size:.6rem;">Stream ' + (i + 1) + '</span></div>';
