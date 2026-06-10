@@ -3827,9 +3827,8 @@ const LIVE_EVENTS_URL = 'https://canchatv.online/res/json/eventos_unificados.jso
 const LIVE_CATEGORIES_URL = 'https://canchatv.online/res/json/categorias.json';
 let liveCategories = {};
 
-// Proxy interno de Cloudflare Pages (/_worker.js)
-// Si no usas Cloudflare Pages, cambia por tu propio endpoint
-const LIVE_PROXY = '/proxy';
+// Proxy en Deno Deploy (Google Cloud — evita bloqueo de Cloudflare)
+const LIVE_PROXY = 'https://lacrimosa-yvewqqbwxx31.lacrimosa-proyect.deno.net';
 
 // Detect if local proxy is available
 function getLiveProxyBase() {
