@@ -192,6 +192,40 @@ header{
 }
 .close-btn:hover{border-color:var(--text);color:var(--text);background:rgba(255,255,255,.12);}
 .player-box{width:100%;aspect-ratio:16/9;background:#000;border-radius:4px;overflow:hidden;border:none;position:relative;}
+/* Fullscreen personalizado: el contenedor del player, NO solo el iframe */
+.media-player-box:-webkit-full-screen,
+.media-player-box:-moz-full-screen,
+.media-player-box:-ms-fullscreen,
+.media-player-box:fullscreen{
+  width:100vw;height:100vh;aspect-ratio:auto;border-radius:0;
+  background:#000;display:flex;flex-direction:column;
+}
+.media-player-box:-webkit-full-screen #mediaFrame,
+.media-player-box:-moz-full-screen #mediaFrame,
+.media-player-box:-ms-fullscreen #mediaFrame,
+.media-player-box:fullscreen #mediaFrame{
+  position:absolute;inset:0;width:100%;height:100%;z-index:1;
+}
+.media-player-box:-webkit-full-screen .media-placeholder,
+.media-player-box:-moz-full-screen .media-placeholder,
+.media-player-box:-ms-fullscreen .media-placeholder,
+.media-player-box:fullscreen .media-placeholder{
+  position:absolute;inset:0;z-index:2;
+}
+.media-player-box:-webkit-full-screen .next-ep-overlay,
+.media-player-box:-moz-full-screen .next-ep-overlay,
+.media-player-box:-ms-fullscreen .next-ep-overlay,
+.media-player-box:fullscreen .next-ep-overlay{
+  position:absolute;bottom:0;right:0;z-index:20;
+  width:420px;max-width:95%;
+}
+/* Botón fullscreen */
+.fs-btn{
+  background:var(--card);border:1px solid var(--border);color:var(--muted2);
+  border-radius:6px;padding:.32rem .65rem;cursor:pointer;font-size:.9rem;
+  transition:all .2s;line-height:1;display:flex;align-items:center;justify-content:center;
+}
+.fs-btn:hover{border-color:var(--accent3);color:var(--accent3);}
 .player-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.7rem;background:#000;color:var(--muted);}
 .tv-ico{font-size:2.6rem;}
 .status-row{display:flex;align-items:center;gap:.7rem;margin-top:.6rem;}
@@ -804,6 +838,114 @@ footer a:hover{color:var(--text);text-decoration:underline;}
   .auth-modal{margin:0 .5rem;}
 }
 
+/* ── NEXT EPISODE OVERLAY (Netflix-style) ── */
+.next-ep-overlay{
+  position:absolute;bottom:0;right:0;
+  width:400px;max-width:92%;
+  background:rgba(10,10,18,0.96);
+  border:1px solid var(--border2);border-radius:var(--radius) 0 0 0;
+  padding:1rem;z-index:15;
+  display:none;flex-direction:column;gap:.7rem;
+  animation:slideUpIn .4s var(--netflix-transition);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  box-shadow:0 -4px 30px rgba(0,0,0,.7);
+}
+@keyframes slideUpIn{
+  from{opacity:0;transform:translateY(30px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@keyframes slideDownOut{
+  from{opacity:1;transform:translateY(0)}
+  to{opacity:0;transform:translateY(30px)}
+}
+.next-ep-overlay.closing{animation:slideDownOut .3s ease forwards;}
+.next-ep-overlay.visible{display:flex;}
+.next-ep-header{
+  display:flex;align-items:center;justify-content:space-between;
+  font-family:var(--font-body);font-size:.7rem;color:var(--accent3);
+  font-weight:700;letter-spacing:.5px;
+}
+.next-ep-close-btn{
+  background:none;border:none;color:var(--muted2);cursor:pointer;
+  font-size:.9rem;padding:.1rem .3rem;border-radius:4px;transition:color .2s;line-height:1;
+}
+.next-ep-close-btn:hover{color:var(--text);}
+.next-ep-body{display:flex;gap:.7rem;align-items:center;}
+.next-ep-still-wrap{
+  width:140px;aspect-ratio:16/9;flex-shrink:0;
+  background:var(--card2);border-radius:4px;overflow:hidden;position:relative;
+}
+.next-ep-still{width:100%;height:100%;object-fit:cover;display:block;}
+.next-ep-still-fb{
+  width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+  font-size:2rem;background:var(--card2);
+}
+.next-ep-details{flex:1;min-width:0;display:flex;flex-direction:column;gap:.25rem;}
+.next-ep-label{font-family:var(--font-mono);font-size:.55rem;color:var(--accent);letter-spacing:.8px;}
+.next-ep-name{
+  font-size:.82rem;font-weight:700;line-height:1.25;
+  overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+}
+.next-ep-meta{font-family:var(--font-mono);font-size:.58rem;color:var(--muted2);}
+.next-ep-actions{display:flex;align-items:center;gap:.5rem;}
+/* Countdown circle */
+.next-ep-countdown-wrap{
+  position:relative;width:44px;height:44px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+}
+.next-ep-countdown-svg{position:absolute;inset:0;transform:rotate(-90deg);}
+.next-ep-countdown-bg{fill:none;stroke:var(--border2);stroke-width:3;}
+.next-ep-countdown-fg{
+  fill:none;stroke:var(--accent);stroke-width:3;
+  stroke-linecap:round;transition:stroke-dashoffset 1s linear, stroke .3s;
+}
+.next-ep-countdown-num{
+  font-family:var(--font-display);font-size:1.1rem;color:var(--text);z-index:1;
+}
+.next-ep-play-now{
+  flex:1;background:var(--accent);border:none;border-radius:6px;
+  padding:.45rem .8rem;color:#fff;font-family:var(--font-body);
+  font-size:.72rem;font-weight:700;cursor:pointer;
+  letter-spacing:.3px;transition:all .2s;
+  display:flex;align-items:center;justify-content:center;gap:.3rem;
+}
+.next-ep-play-now:hover{opacity:.85;transform:scale(1.02);}
+.next-ep-cancel-btn{
+  background:rgba(255,255,255,.06);border:1px solid var(--border);
+  border-radius:6px;padding:.4rem .7rem;color:var(--muted2);
+  font-family:var(--font-body);font-size:.65rem;font-weight:600;cursor:pointer;
+  transition:all .2s;white-space:nowrap;
+}
+.next-ep-cancel-btn:hover{border-color:var(--text);color:var(--text);}
+@media(max-width:640px){
+  .next-ep-overlay{width:100%;max-width:100%;bottom:0;right:0;border-radius:var(--radius) var(--radius) 0 0;padding:.7rem;}
+  .next-ep-still-wrap{width:100px;}
+  .next-ep-name{font-size:.7rem;}
+  .next-ep-countdown-wrap{width:36px;height:36px;}
+  .next-ep-countdown-num{font-size:.9rem;}
+}
+/* ── NEXT EPISODE BUTTON (debajo del player) ── */
+.next-ep-trigger-row{
+  display:none;align-items:center;gap:.7rem;
+  margin-top:.8rem;padding:.6rem .9rem;
+  background:rgba(255,255,255,.03);border:1px solid var(--border);
+  border-radius:var(--radius);cursor:pointer;
+  transition:all .25s;
+}
+.next-ep-trigger-row.visible{display:flex;}
+.next-ep-trigger-row:hover{background:rgba(255,255,255,.06);border-color:var(--border2);}
+.next-ep-trigger-still{
+  width:60px;aspect-ratio:16/9;border-radius:4px;object-fit:cover;flex-shrink:0;
+  background:var(--card2);
+}
+.next-ep-trigger-info{flex:1;min-width:0;}
+.next-ep-trigger-label{font-family:var(--font-mono);font-size:.55rem;color:var(--accent3);letter-spacing:.5px;}
+.next-ep-trigger-name{font-size:.74rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.next-ep-trigger-arrow{font-size:1.5rem;color:var(--accent);flex-shrink:0;margin-left:auto;animation:bounceRight 1s ease infinite;}
+@keyframes bounceRight{
+  0%,100%{transform:translateX(0)}
+  50%{transform:translateX(6px)}
+}
 /* ── TOAST NOTIFICATIONS ── */
 .toast-container{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;display:flex;flex-direction:column;gap:.5rem;pointer-events:none;}
 .toast{
@@ -1297,6 +1439,7 @@ footer a:hover{color:var(--text);text-decoration:underline;}
   </div>
   <div class="header-right">
     <span class="total-badge" id="totalBadge">TMDB API</span>
+    <a href="tv.html" title="Versión ultra-ligera para Smart TV" style="text-decoration:none;color:var(--muted2);font-size:.7rem;font-family:var(--font-mono);opacity:.6;transition:opacity .2s;white-space:nowrap;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.6'">📺 TV</a>
     <!-- Login button (visible when logged out) -->
     <button id="userLoginBtn" class="user-btn" onclick="openAuthModal()">👤 Entrar</button>
     <!-- User avatar + dropdown (visible when logged in) -->
@@ -1353,6 +1496,7 @@ footer a:hover{color:var(--text);text-decoration:underline;}
       <div style="display:flex;gap:.5rem;align-items:center;">
         <span class="spill" id="mediaSpill">—</span>
         <button id="castBtn" title="Transmitir a Chromecast" onclick="startCast()" style="display:none;background:var(--card);border:1px solid var(--border);color:var(--muted2);border-radius:6px;padding:.32rem .65rem;cursor:pointer;font-size:.85rem;transition:all .2s;line-height:1;" onmouseover="this.style.borderColor='var(--accent3)';this.style.color='var(--accent3)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted2)'">⛶</button>
+        <button class="fs-btn" id="playerFsBtn" onclick="togglePlayerFullscreen()" title="Pantalla Completa (incluye siguiente capítulo)">⛶</button>
         <button style="background:var(--card);border:1px solid var(--border);color:var(--muted2);border-radius:6px;padding:.32rem .7rem;cursor:pointer;font-family:var(--font-mono);font-size:.68rem;transition:all .2s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted2)'" onclick="closeMediaPlayer()">✕ CERRAR</button>
       </div>
     </div>
@@ -1362,6 +1506,45 @@ footer a:hover{color:var(--text);text-decoration:underline;}
         <div style="font-size:.82rem">Cargando reproductor…</div>
       </div>
       <iframe id="mediaFrame" allowfullscreen allow="autoplay; fullscreen; encrypted-media" style="display:none;"></iframe>
+      <!-- NEXT EPISODE OVERLAY (Netflix-style) -->
+      <div class="next-ep-overlay" id="nextEpOverlay">
+        <div class="next-ep-header">
+          <span>⏭️ PRÓXIMO EPISODIO</span>
+          <button class="next-ep-close-btn" onclick="cancelNextEp()" title="Cancelar">✕</button>
+        </div>
+        <div class="next-ep-body">
+          <div class="next-ep-still-wrap">
+            <img class="next-ep-still" id="nextEpStill" src="" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <div class="next-ep-still-fb" id="nextEpStillFb" style="display:none">📺</div>
+          </div>
+          <div class="next-ep-details">
+            <div class="next-ep-label" id="nextEpLabel">T1 · EP2</div>
+            <div class="next-ep-name" id="nextEpName">—</div>
+            <div class="next-ep-meta" id="nextEpMeta"></div>
+          </div>
+        </div>
+        <div class="next-ep-actions">
+          <div class="next-ep-countdown-wrap">
+            <svg class="next-ep-countdown-svg" viewBox="0 0 44 44" width="44" height="44">
+              <circle class="next-ep-countdown-bg" cx="22" cy="22" r="19"></circle>
+              <circle class="next-ep-countdown-fg" id="nextEpCountdownCircle" cx="22" cy="22" r="19"
+                stroke-dasharray="119.38" stroke-dashoffset="0"></circle>
+            </svg>
+            <span class="next-ep-countdown-num" id="nextEpCountdownNum">10</span>
+          </div>
+          <button class="next-ep-play-now" onclick="playNextEpNow()">▶ Reproducir Ahora</button>
+          <button class="next-ep-cancel-btn" onclick="cancelNextEp()">Cancelar</button>
+        </div>
+      </div>
+    </div>
+    <!-- NEXT EPISODE TRIGGER ROW (debajo del player) -->
+    <div class="next-ep-trigger-row" id="nextEpTriggerRow" onclick="startNextEpFromTrigger()">
+      <img class="next-ep-trigger-still" id="nextEpTriggerStill" src="" alt="" onerror="this.style.display='none'">
+      <div class="next-ep-trigger-info">
+        <div class="next-ep-trigger-label" id="nextEpTriggerLabel">SIGUIENTE</div>
+        <div class="next-ep-trigger-name" id="nextEpTriggerName">—</div>
+      </div>
+      <span class="next-ep-trigger-arrow">▶</span>
     </div>
     <div class="series-src-row" id="mediaSrcRow" style="margin-top:.7rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
       <span style="font-family:var(--font-mono);font-size:.62rem;color:var(--muted2)">IDIOMA:</span>
@@ -2111,6 +2294,16 @@ function loadMediaEmbed(tmdbId, season, ep, srcIdx) {
 
   document.getElementById('mediaPlayerSection').classList.add('visible');
   document.getElementById('mediaPlayerSection').scrollIntoView({behavior:'smooth',block:'start'});
+
+  // ── Actualizar UI del siguiente episodio (solo TV) ──
+  if (mediaType === 'tv') {
+    setTimeout(function() {
+      updateNextEpisodeUI(season, ep);
+    }, 800);
+  } else {
+    hideNextEpTrigger();
+    hideNextEpOverlay();
+  }
 }
 
 function switchMediaSrc(idx) {
@@ -2143,6 +2336,12 @@ var _savedMediaSrcRowHTML = '';
 function closeMediaPlayer() {
   // Cancelar cualquier carga pendiente
   _mediaLoadToken++;
+
+  // Cancelar countdown de siguiente episodio
+  cancelNextEp();
+  _nextEpData = null;
+  hideNextEpTrigger();
+  hideNextEpOverlay();
 
   // Restaurar fila de fuentes original si fue modificada
   if (_savedMediaSrcRowHTML) {
@@ -2300,7 +2499,332 @@ function selectEpisode(seasonNum, epNum) {
   // Re-render para actualizar highlight (usa caché, es instantáneo)
   renderEpisodes(seasonNum);
   document.getElementById('mediaPlayerSection').scrollIntoView({behavior:'smooth',block:'start'});
+  // Cancelar cualquier countdown pendiente
+  cancelNextEp();
+  // Mostrar trigger del siguiente episodio
+  setTimeout(function(){ updateNextEpisodeUI(seasonNum, epNum); }, 600);
 }
+
+// ═══════════════════════════════════════════════════════
+//  NEXT EPISODE — Netflix-style auto-advance
+// ═══════════════════════════════════════════════════════
+var _nextEpData = null;       // { seasonNum, epNum, stillPath, name, runtime, airDate }
+var _nextEpTimer = null;
+var _nextEpCountdown = 10;
+var _nextEpActive = false;
+
+// ── Obtener info del siguiente episodio ──
+async function getNextEpisodeInfo(currentSeason, currentEp) {
+  if (!currentSeries || !currentSeries.id) return null;
+  var totalSeasons = seriesSeasons.filter(function(s){ return s.season_number > 0; });
+  if (!totalSeasons.length) return null;
+
+  // Buscar en la misma temporada
+  var episodes = await fetchEpisodes(currentSeries.id, currentSeason);
+  if (episodes && episodes.length > 0) {
+    for (var i = 0; i < episodes.length; i++) {
+      if (episodes[i].episode_number === currentEp && i + 1 < episodes.length) {
+        var next = episodes[i + 1];
+        return {
+          seasonNum: currentSeason,
+          epNum: next.episode_number,
+          stillPath: next.still_path || null,
+          name: next.name || ('Episodio ' + next.episode_number),
+          runtime: next.runtime || null,
+          airDate: next.air_date || null,
+          overview: next.overview || null
+        };
+      }
+    }
+  }
+
+  // Buscar en la siguiente temporada
+  var currentSeasonIdx = -1;
+  for (var j = 0; j < totalSeasons.length; j++) {
+    if (totalSeasons[j].season_number === currentSeason) { currentSeasonIdx = j; break; }
+  }
+  if (currentSeasonIdx >= 0 && currentSeasonIdx + 1 < totalSeasons.length) {
+    var nextSeason = totalSeasons[currentSeasonIdx + 1].season_number;
+    var nextSeasonEps = await fetchEpisodes(currentSeries.id, nextSeason);
+    if (nextSeasonEps && nextSeasonEps.length > 0) {
+      var firstEp = nextSeasonEps[0];
+      return {
+        seasonNum: nextSeason,
+        epNum: firstEp.episode_number || 1,
+        stillPath: firstEp.still_path || null,
+        name: firstEp.name || ('Episodio ' + (firstEp.episode_number || 1)),
+        runtime: firstEp.runtime || null,
+        airDate: firstEp.air_date || null,
+        overview: firstEp.overview || null
+      };
+    }
+  }
+
+  return null; // No hay siguiente episodio
+}
+
+// ── Actualizar UI del siguiente episodio (trigger row + overlay) ──
+async function updateNextEpisodeUI(currentSeason, currentEp) {
+  if (!currentSeries || mediaType !== 'tv') {
+    hideNextEpTrigger();
+    hideNextEpOverlay();
+    return;
+  }
+
+  var next = await getNextEpisodeInfo(currentSeason, currentEp);
+  _nextEpData = next;
+
+  if (!next) {
+    hideNextEpTrigger();
+    hideNextEpOverlay();
+    return;
+  }
+
+  // ── Actualizar trigger row (debajo del player) ──
+  var triggerRow = document.getElementById('nextEpTriggerRow');
+  var triggerStill = document.getElementById('nextEpTriggerStill');
+  var triggerLabel = document.getElementById('nextEpTriggerLabel');
+  var triggerName = document.getElementById('nextEpTriggerName');
+
+  if (triggerLabel) triggerLabel.textContent = 'SIGUIENTE · T' + next.seasonNum + ' EP' + next.epNum;
+  if (triggerName) triggerName.textContent = next.name;
+  if (triggerStill && next.stillPath) {
+    triggerStill.src = tmdbImg('w300', next.stillPath);
+    triggerStill.style.display = '';
+  } else if (triggerStill) {
+    triggerStill.style.display = 'none';
+  }
+  if (triggerRow) triggerRow.classList.add('visible');
+
+  // ── Actualizar overlay (dentro del player) ──
+  var still = document.getElementById('nextEpStill');
+  var stillFb = document.getElementById('nextEpStillFb');
+  var label = document.getElementById('nextEpLabel');
+  var name = document.getElementById('nextEpName');
+  var meta = document.getElementById('nextEpMeta');
+
+  if (label) label.textContent = 'T' + next.seasonNum + ' · EP' + next.epNum;
+  if (name) name.textContent = next.name;
+  if (meta) {
+    var metaParts = [];
+    if (next.runtime) metaParts.push(next.runtime + ' min');
+    if (next.airDate) metaParts.push(next.airDate);
+    meta.textContent = metaParts.join(' · ');
+  }
+  if (still && next.stillPath) {
+    still.src = tmdbImg('w300', next.stillPath);
+    still.style.display = '';
+    if (stillFb) stillFb.style.display = 'none';
+  } else if (still) {
+    still.style.display = 'none';
+    if (stillFb) stillFb.style.display = 'flex';
+  }
+}
+
+// ── Iniciar countdown desde el trigger row ──
+function startNextEpFromTrigger() {
+  if (!_nextEpData) return;
+  startNextEpCountdown();
+}
+
+// ── Mostrar overlay y empezar countdown ──
+function startNextEpCountdown() {
+  if (!_nextEpData || _nextEpActive) return;
+  _nextEpActive = true;
+
+  var overlay = document.getElementById('nextEpOverlay');
+  var circle = document.getElementById('nextEpCountdownCircle');
+  var num = document.getElementById('nextEpCountdownNum');
+  var triggerRow = document.getElementById('nextEpTriggerRow');
+
+  // Reset countdown
+  _nextEpCountdown = 10;
+  if (num) num.textContent = '10';
+  if (circle) {
+    circle.style.strokeDashoffset = '0';
+    circle.style.stroke = 'var(--accent)';
+    circle.style.transition = 'none';
+  }
+
+  // Mostrar overlay
+  if (overlay) {
+    overlay.classList.remove('closing');
+    overlay.classList.add('visible');
+  }
+  // Ocultar trigger row durante countdown
+  if (triggerRow) triggerRow.classList.remove('visible');
+
+  // Iniciar timer
+  if (_nextEpTimer) clearInterval(_nextEpTimer);
+  var circumference = 119.38; // 2 * PI * 19
+
+  _nextEpTimer = setInterval(function() {
+    _nextEpCountdown--;
+    if (num) num.textContent = _nextEpCountdown;
+
+    // Actualizar círculo
+    if (circle) {
+      var offset = circumference * (1 - _nextEpCountdown / 10);
+      circle.style.transition = 'stroke-dashoffset 1s linear, stroke .3s';
+      circle.style.strokeDashoffset = offset;
+      if (_nextEpCountdown <= 3) {
+        circle.style.stroke = 'var(--accent)';
+      }
+    }
+
+    if (_nextEpCountdown <= 0) {
+      clearInterval(_nextEpTimer);
+      _nextEpTimer = null;
+      playNextEpNow();
+    }
+  }, 1000);
+}
+
+// ── Reproducir siguiente episodio AHORA ──
+function playNextEpNow() {
+  if (_nextEpTimer) { clearInterval(_nextEpTimer); _nextEpTimer = null; }
+  if (!_nextEpData) { hideNextEpOverlay(); return; }
+
+  var next = _nextEpData;
+  _nextEpActive = false;
+  _nextEpData = null;
+
+  // Ocultar overlay y trigger
+  hideNextEpOverlay();
+  hideNextEpTrigger();
+
+  // Reproducir el siguiente episodio
+  if (currentSeries) {
+    selectEpisode(next.seasonNum, next.epNum);
+    showToast('▶ Reproduciendo T' + next.seasonNum + ' EP' + next.epNum + ': ' + next.name, 'ok');
+  }
+}
+
+// ── Cancelar countdown ──
+function cancelNextEp() {
+  if (_nextEpTimer) { clearInterval(_nextEpTimer); _nextEpTimer = null; }
+  _nextEpActive = false;
+  hideNextEpOverlay();
+  // Volver a mostrar trigger row si hay siguiente episodio
+  if (_nextEpData) {
+    var triggerRow = document.getElementById('nextEpTriggerRow');
+    if (triggerRow) triggerRow.classList.add('visible');
+  }
+}
+
+// ── Ocultar overlay ──
+function hideNextEpOverlay() {
+  var overlay = document.getElementById('nextEpOverlay');
+  if (overlay && overlay.classList.contains('visible')) {
+    overlay.classList.add('closing');
+    setTimeout(function() {
+      overlay.classList.remove('visible');
+      overlay.classList.remove('closing');
+    }, 280);
+  }
+}
+
+// ── Ocultar trigger row ──
+function hideNextEpTrigger() {
+  var triggerRow = document.getElementById('nextEpTriggerRow');
+  if (triggerRow) triggerRow.classList.remove('visible');
+}
+
+// ═══════════════════════════════════════════════════════
+//  FULLSCREEN PERSONALIZADO — incluye overlay de siguiente capítulo
+// ═══════════════════════════════════════════════════════
+function togglePlayerFullscreen() {
+  var box = document.querySelector('.media-player-box');
+  if (!box) return;
+
+  var fsBtn = document.getElementById('playerFsBtn');
+  var isFS = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+
+  if (!isFS) {
+    // Entrar a fullscreen en el contenedor del player
+    if (box.requestFullscreen) {
+      box.requestFullscreen();
+    } else if (box.webkitRequestFullscreen) {
+      box.webkitRequestFullscreen();
+    } else if (box.mozRequestFullScreen) {
+      box.mozRequestFullScreen();
+    } else if (box.msRequestFullscreen) {
+      box.msRequestFullscreen();
+    }
+    if (fsBtn) fsBtn.textContent = '✕';
+  } else {
+    // Salir de fullscreen
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    } else if (document.mozCancelFullScreen) {
+      document.mozCancelFullScreen();
+    } else if (document.msExitFullscreen) {
+      document.msExitFullscreen();
+    }
+    if (fsBtn) fsBtn.textContent = '⛶';
+  }
+}
+
+// ── Detectar cambios de fullscreen (entrada = ocultar overlay, salida = mostrar siguiente capítulo) ──
+function handleFullscreenChange() {
+  var isFS = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+  var fsBtn = document.getElementById('playerFsBtn');
+  var overlay = document.getElementById('nextEpOverlay');
+  var triggerRow = document.getElementById('nextEpTriggerRow');
+
+  if (!isFS) {
+    // ── SALIÓ de fullscreen ──
+    if (fsBtn) fsBtn.textContent = '⛶';
+
+    // Si hay un siguiente episodio disponible, SIEMPRE mostrar el overlay con countdown al salir de FS
+    // (El usuario probablemente terminó de ver el episodio)
+    if (_nextEpData && !_nextEpActive && document.getElementById('mediaPlayerSection').classList.contains('visible')) {
+      // Pequeño delay para que la UI se recomponga después de salir de FS
+      setTimeout(function() {
+        if (_nextEpData && !_nextEpActive) {
+          // Mostrar trigger row primero, luego countdown
+          if (triggerRow) triggerRow.classList.add('visible');
+          startNextEpCountdown();
+        }
+      }, 500);
+    } else if (triggerRow && _nextEpData) {
+      // Si el countdown ya estaba activo, solo re-mostrar el trigger
+      setTimeout(function() {
+        if (triggerRow && _nextEpData) triggerRow.classList.add('visible');
+      }, 300);
+    }
+  } else {
+    // ── ENTRÓ a fullscreen ──
+    if (fsBtn) fsBtn.textContent = '✕';
+    // Ocultar overlay y trigger — en FS solo se ve el video
+    if (overlay) { overlay.classList.remove('visible'); overlay.classList.remove('closing'); }
+    if (triggerRow) triggerRow.classList.remove('visible');
+    // Cancelar countdown activo al entrar a FS
+    if (_nextEpActive) {
+      cancelNextEp();
+    }
+  }
+}
+
+// ── Escuchar eventos de fullscreen ──
+document.addEventListener('fullscreenchange', handleFullscreenChange);
+document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+
+// También detectar tecla Escape para salir de fullscreen
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' || e.keyCode === 27) {
+    // Si estamos en fullscreen del player, al salir mostraremos el overlay (manejado por handleFullscreenChange)
+    // Pequeño delay para que el evento de fullscreenchange se dispare primero
+    setTimeout(function() {
+      var fsBtn = document.getElementById('playerFsBtn');
+      if (fsBtn) fsBtn.textContent = '⛶';
+    }, 100);
+  }
+});
 
 // ═══════════════════════════════════════════════════════
 //  MOVIES — TMDB + multi-embedder
@@ -4086,7 +4610,13 @@ function playLiveStream(uuid, channelIdx) {
   document.getElementById('mediaSpill').className = 'spill live';
   var frame = document.getElementById('mediaFrame');
   var ph = document.getElementById('mediaPlaceholder');
-  document.getElementById('mediaSrcRow').style.display = 'none';
+  // Mostrar botones de acción para streams en vivo
+  var srcRow = document.getElementById('mediaSrcRow');
+  srcRow.style.display = 'flex';
+  srcRow.innerHTML =
+    '<span style="font-family:var(--font-mono);font-size:.62rem;color:var(--muted2)">STREAM:</span>' +
+    '<button class="series-src-btn active" onclick="document.getElementById(\'mediaFrame\').src=\'' + iframeUrl.replace(/'/g, "\\'") + '\'">🔄 Reintentar</button>' +
+    '<a href="' + canal.iframe + '" target="_blank" class="series-src-btn" style="text-decoration:none;color:var(--accent3);border-color:var(--accent3)">🔗 Abrir directo</a>';
   frame.src = iframeUrl;
   ph.style.display = 'none';
   frame.style.display = 'block';
