@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LACRIMOSA.xyz — TV Lite</title>
+<style>
+/* ═══════════════════════════════════════════════════════
+   TV LITE — ultra-ligero, sin backdrop-filter, sin blur, sin animaciones pesadas
+   Optimizado para Smart TV / Fire TV / Android TV / navegadores débiles
+   ═══════════════════════════════════════════════════════ */
+:root {
+  --bg: #0a0a0f;
+  --surface: #111118;
+  --card: #161622;
+  --border: #222233;
+  --accent: #e50914;
+  --accent3: #46b5c0;
+  --text: #ffffff;
+  --muted: #888899;
+  --live: #3dcc6e;
+  --radius: 6px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{background:var(--bg);}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:'Segoe UI',Arial,sans-serif;
+  min-height:100vh;overflow-x:hidden;
+  -webkit-user-select:none;user-select:none;
+}
+
+/* Header simple */
+header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 20px;height:52px;
+  background:var(--surface);border-bottom:1px solid var(--border);
+}
+.logo{
+  font-size:22px;font-weight:900;letter-spacing:2px;
+  color:var(--accent);cursor:pointer;
+}
+.logo span{color:var(--text);}
+.header-right{display:flex;gap:10px;align-items:center;font-size:13px;color:var(--muted);}
+
+/* Tabs de categoría */
+.cat-bar{
+  display:flex;gap:0;
+  background:var(--surface);border-bottom:1px solid var(--border);
+  padding:0 16px;overflow-x:auto;
+}
+.cat-tab{
+  padding:12px 20px;font-size:15px;font-weight:600;
+  color:var(--muted);background:none;border:none;
+  border-bottom:3px solid transparent;cursor:pointer;
+  white-space:nowrap;transition:color .15s;
+}
+.cat-tab:hover,.cat-tab:focus{color:var(--text);}
+.cat-tab.active{color:var(--text);border-bottom-color:var(--accent);}
+
+/* Buscador */
+.search-bar{
+  padding:10px 20px;background:var(--surface);
+  border-bottom:1px solid var(--border);
+  display:flex;gap:8px;
+}
+.search-input{
+  flex:1;background:#1a1a28;border:1px solid var(--border);
+  border-radius:var(--radius);padding:10px 14px;
+  color:var(--text);font-size:15px;outline:none;
+}
+.search-input:focus{border-color:var(--accent);}
+.search-btn{
+  background:var(--accent);color:#fff;border:none;
+  border-radius:var(--radius);padding:10px 22px;
+  font-size:14px;font-weight:700;cursor:pointer;
+}
+
+/* Contenedores */
+.section{display:none;padding:16px 20px;}
+.section.visible{display:block;}
+
+/* Grid de contenido — columnas fijas (más rápido que auto-fill) */
+.content-grid{
+  display:grid;grid-template-columns:repeat(4, 1fr);gap:14px;
+}
+@media(max-width:960px){.content-grid{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:640px){.content-grid{grid-template-columns:repeat(2,1fr);}}
+
+/* Cards — sin hover transforms, sin sombras complejas, sin animaciones */
+.card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);overflow:hidden;cursor:pointer;
+  transition:border-color .15s;
+}
+.card:focus,.card:hover{border-color:var(--accent);}
+.card-poster{
+  width:100%;aspect-ratio:2/3;object-fit:cover;
+  display:block;background:var(--surface);
+}
+.card-poster-fb{
+  width:100%;aspect-ratio:2/3;display:flex;
+  align-items:center;justify-content:center;
+  font-size:40px;background:var(--surface);
+}
+.card-info{padding:10px 12px;}
+.card-name{
+  font-size:14px;font-weight:600;line-height:1.3;
+  overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  margin-bottom:4px;color:#ddd;
+}
+.card-meta{font-size:11px;color:var(--muted);display:flex;gap:8px;}
+.card-score{
+  position:absolute;top:6px;right:6px;
+  background:rgba(0,0,0,.85);border-radius:3px;
+  font-size:11px;font-weight:700;color:#ffc107;
+  padding:2px 7px;
+}
+
+/* Player */
+.player-section{display:none;background:var(--surface);border-bottom:1px solid var(--border);}
+.player-section.visible{display:block;}
+.player-inner{padding:14px 20px;max-width:1100px;}
+.player-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:10px;}
+.player-title{font-size:20px;font-weight:700;}
+.player-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+.player-box{
+  width:100%;aspect-ratio:16/9;background:#000;
+  border-radius:var(--radius);overflow:hidden;position:relative;
+}
+.player-box iframe{
+  width:100%;height:100%;border:none;display:block;
+}
+.player-placeholder{
+  position:absolute;inset:0;display:flex;
+  align-items:center;justify-content:center;
+  background:#000;color:var(--muted);font-size:18px;
+}
+
+/* Botones */
+.btn{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);padding:8px 16px;
+  color:var(--muted);font-size:13px;font-weight:600;
+  cursor:pointer;transition:all .15s;
+}
+.btn:hover,.btn:focus{border-color:var(--accent);color:var(--accent);}
+.btn-accent{background:var(--accent);border-color:var(--accent);color:#fff;}
+.btn-accent:hover,.btn-accent:focus{opacity:.85;color:#fff;}
+
+/* Source pills */
+.src-row{display:flex;align-items:center;gap:6px;margin-top:10px;flex-wrap:wrap;}
+.src-btn{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);padding:6px 12px;
+  color:var(--muted);font-size:12px;font-weight:600;
+  cursor:pointer;transition:all .12s;
+}
+.src-btn:hover,.src-btn:focus{border-color:var(--text);color:var(--text);}
+.src-btn.active{background:var(--text);border-color:var(--text);color:#000;}
+
+/* Episodes section */
+.ep-section{display:none;padding:12px 20px;background:var(--surface);border-bottom:1px solid var(--border);}
+.ep-section.visible{display:block;}
+.ep-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+@media(max-width:640px){.ep-grid{grid-template-columns:1fr;}}
+.ep-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);padding:10px 12px;cursor:pointer;
+  display:flex;gap:10px;transition:border-color .12s;
+}
+.ep-card:hover,.ep-card:focus,.ep-card.active{border-color:var(--accent);}
+.ep-still{
+  width:100px;aspect-ratio:16/9;flex-shrink:0;
+  background:var(--surface);object-fit:cover;border-radius:3px;
+}
+.ep-body{flex:1;min-width:0;}
+.ep-num{font-size:10px;color:var(--accent);font-weight:700;letter-spacing:.5px;}
+.ep-name{font-size:14px;font-weight:600;margin:2px 0;}
+.ep-meta{font-size:11px;color:var(--muted);}
+
+/* Season tabs */
+.season-tabs{display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;}
+.season-tab{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);padding:6px 14px;
+  color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;
+}
+.season-tab:hover,.season-tab:focus{border-color:var(--text);color:var(--text);}
+.season-tab.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+
+/* Next Episode — TV-friendly overlay */
+.next-ep-overlay{
+  position:absolute;bottom:0;right:0;
+  width:420px;max-width:90%;
+  background:#0d0d15;border:1px solid var(--border);
+  border-radius:var(--radius) 0 0 0;padding:14px;
+  z-index:20;display:none;flex-direction:column;gap:10px;
+}
+.next-ep-overlay.visible{display:flex;}
+.next-ep-header{display:flex;align-items:center;justify-content:space-between;font-size:13px;color:var(--accent3);font-weight:700;}
+.next-ep-body{display:flex;gap:10px;align-items:center;}
+.next-ep-still{width:120px;aspect-ratio:16/9;border-radius:4px;object-fit:cover;background:var(--surface);}
+.next-ep-details{flex:1;min-width:0;}
+.next-ep-label{font-size:11px;color:var(--accent);}
+.next-ep-name{font-size:15px;font-weight:700;margin:2px 0;}
+.next-ep-meta{font-size:11px;color:var(--muted);}
+.next-ep-actions{display:flex;align-items:center;gap:8px;}
+.countdown-circle{
+  width:40px;height:40px;border-radius:50%;
+  border:3px solid var(--border);display:flex;
+  align-items:center;justify-content:center;
+  font-size:18px;font-weight:700;flex-shrink:0;
+  position:relative;
+}
+.countdown-circle::before{
+  content:'';position:absolute;inset:-3px;border-radius:50%;
+  border:3px solid var(--accent);border-top-color:transparent;
+  animation:spin 1s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.next-ep-trigger{
+  display:none;align-items:center;gap:8px;
+  margin-top:10px;padding:10px 14px;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);cursor:pointer;
+}
+.next-ep-trigger.visible{display:flex;}
+.next-ep-trigger:hover,.next-ep-trigger:focus{border-color:var(--accent);}
+.next-ep-trigger-arrow{font-size:22px;color:var(--accent);margin-left:auto;}
+
+/* Focus visible para navegación con control remoto */
+*:focus-visible{
+  outline:2px solid var(--accent);outline-offset:2px;
+}
+
+/* Empty / Loading */
+.empty-state{text-align:center;padding:40px 20px;color:var(--muted);font-size:15px;}
+.spinner{
+  width:32px;height:32px;border:3px solid var(--border);
+  border-top-color:var(--accent);border-radius:50%;
+  animation:spin .8s linear infinite;margin:0 auto 12px;
+}
+.loading{text-align:center;padding:40px 20px;color:var(--muted);}
+
+/* Footer */
+footer{text-align:center;padding:20px;color:var(--muted);font-size:11px;}
+
+/* Modal ligero */
+.modal-bg{
+  position:fixed;inset:0;background:rgba(0,0,0,.9);
+  z-index:100;display:none;align-items:center;justify-content:center;
+  padding:20px;
+}
+.modal-bg.open{display:flex;}
+.modal{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);max-width:600px;width:100%;
+  max-height:85vh;overflow-y:auto;padding:20px;
+}
+.modal-title{font-size:24px;font-weight:700;margin-bottom:6px;}
+.modal-sub{font-size:13px;color:var(--muted);margin-bottom:12px;}
+.modal-desc{font-size:14px;color:#ccc;line-height:1.5;margin-bottom:14px;}
+.modal-selectors{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center;}
+.modal-select{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);padding:8px 12px;
+  color:var(--text);font-size:14px;outline:none;
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo" onclick="showMainView()">LACRI<span>MOSA</span></div>
+  <div class="header-right" style="display:flex;gap:14px;align-items:center;">
+    <span id="headerBadge" style="font-size:13px;color:var(--muted);">📺 TV Lite</span>
+    <a href="index.html" style="text-decoration:none;color:var(--accent3);font-size:13px;font-weight:600;">💻 Versión Completa</a>
+  </div>
+</header>
+
+<!-- CATEGORY TABS -->
+<div class="cat-bar">
+  <button class="cat-tab active" data-cat="series">📺 Series</button>
+  <button class="cat-tab" data-cat="movies">🎬 Películas</button>
+  <button class="cat-tab" data-cat="anime">🌸 Anime</button>
+  <button class="cat-tab" data-cat="docs">🎥 Docs</button>
+</div>
+
+<!-- SEARCH -->
+<div class="search-bar">
+  <input class="search-input" id="searchInput" type="text" placeholder="Buscar…" onkeydown="if(event.key==='Enter')doSearch()">
+  <button class="search-btn" onclick="doSearch()">BUSCAR</button>
+</div>
+
+<!-- PLAYER -->
+<div class="player-section" id="playerSection">
+  <div class="player-inner">
+    <div class="player-header">
+      <div>
+        <div class="player-title" id="playerTitle">—</div>
+        <div class="player-sub" id="playerSub"></div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <span id="playerStatus" style="font-size:12px;color:var(--muted);">—</span>
+        <button class="btn" onclick="closePlayer()">✕ CERRAR</button>
+      </div>
+    </div>
+    <div class="player-box" id="playerBox">
+      <div class="player-placeholder" id="playerPlaceholder">
+        <span>🎬 Cargando reproductor…</span>
+      </div>
+      <iframe id="playerFrame" allowfullscreen allow="autoplay; fullscreen; encrypted-media" style="display:none;"></iframe>
+      <!-- Next Episode Overlay -->
+      <div class="next-ep-overlay" id="nextEpOverlay">
+        <div class="next-ep-header">
+          <span>⏭️ PRÓXIMO EPISODIO</span>
+          <button class="btn" onclick="cancelNextEp()" style="padding:4px 8px;font-size:16px;">✕</button>
+        </div>
+        <div class="next-ep-body">
+          <img class="next-ep-still" id="nextEpStill" src="" alt="">
+          <div class="next-ep-details">
+            <div class="next-ep-label" id="nextEpLabel">T1 · EP2</div>
+            <div class="next-ep-name" id="nextEpName">—</div>
+            <div class="next-ep-meta" id="nextEpMeta"></div>
+          </div>
+        </div>
+        <div class="next-ep-actions">
+          <div class="countdown-circle" id="nextEpCountdown">10</div>
+          <button class="btn btn-accent" onclick="playNextEpNow()" style="flex:1;">▶ Reproducir Ahora</button>
+          <button class="btn" onclick="cancelNextEp()">Cancelar</button>
+        </div>
+      </div>
+    </div>
+    <!-- Trigger row -->
+    <div class="next-ep-trigger" id="nextEpTrigger" onclick="startNextEpCountdown()">
+      <span style="font-size:13px;color:var(--accent3);">⏭️ SIGUIENTE</span>
+      <span id="nextEpTriggerName" style="font-size:14px;font-weight:600;">—</span>
+      <span class="next-ep-trigger-arrow">▶</span>
+    </div>
+    <!-- Source switching -->
+    <div class="src-row" id="srcRow">
+      <span style="font-size:11px;color:var(--muted);">🌐 IDIOMA:</span>
+      <select id="langSel" onchange="switchLang()" class="modal-select" style="font-size:12px;padding:5px 8px;">
+        <option value="es">Español Latino</option>
+        <option value="es-ES">Español España</option>
+        <option value="en">English</option>
+        <option value="org">Original</option>
+      </select>
+      <span style="font-size:11px;color:var(--muted);margin-left:4px;">📡 FUENTE:</span>
+      <span id="srcBtns"></span>
+    </div>
+  </div>
+</div>
+
+<!-- EPISODES SECTION -->
+<div class="ep-section" id="epSection">
+  <div class="season-tabs" id="seasonTabs"></div>
+  <div class="ep-grid" id="epGrid"></div>
+</div>
+
+<!-- SERIES SECTION -->
+<div class="section visible" id="seriesSection">
+  <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;" id="seriesTabs">
+    <button class="src-btn active" onclick="loadSeries('popular',this)">🔥 Populares</button>
+    <button class="src-btn" onclick="loadSeries('top_rated',this)">⭐ Mejor valoradas</button>
+    <button class="src-btn" onclick="loadSeries('on_the_air',this)">📡 En emisión</button>
+    <button class="src-btn" onclick="loadSeries('airing_today',this)">🗓️ Hoy</button>
+  </div>
+  <div class="content-grid" id="seriesGrid"></div>
+  <div class="loading" id="seriesLoading" style="display:none;"><div class="spinner"></div>Cargando…</div>
+  <button class="btn" id="seriesLoadMore" style="display:none;margin:16px auto;display:block;width:200px;" onclick="seriesNextPage()">CARGAR MÁS</button>
+</div>
+
+<!-- MOVIES SECTION -->
+<div class="section" id="moviesSection">
+  <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;" id="moviesTabs">
+    <button class="src-btn active" onclick="loadMovies('popular',this)">🔥 Populares</button>
+    <button class="src-btn" onclick="loadMovies('top_rated',this)">⭐ Mejor valoradas</button>
+    <button class="src-btn" onclick="loadMovies('now_playing',this)">🎟️ En cartelera</button>
+    <button class="src-btn" onclick="loadMovies('upcoming',this)">🗓️ Próximas</button>
+  </div>
+  <div class="content-grid" id="moviesGrid"></div>
+  <div class="loading" id="moviesLoading" style="display:none;"><div class="spinner"></div>Cargando…</div>
+  <button class="btn" id="moviesLoadMore" style="display:none;margin:16px auto;display:block;width:200px;" onclick="moviesNextPage()">CARGAR MÁS</button>
+</div>
+
+<!-- ANIME SECTION -->
+<div class="section" id="animeSection">
+  <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;" id="animeTabs">
+    <button class="src-btn active" onclick="loadAnime('popular',this)">🔥 Populares</button>
+    <button class="src-btn" onclick="loadAnime('top_rated',this)">⭐ Mejor valorados</button>
+    <button class="src-btn" onclick="loadAnime('airing_today',this)">🗓️ En emisión</button>
+  </div>
+  <div class="content-grid" id="animeGrid"></div>
+  <div class="loading" id="animeLoading" style="display:none;"><div class="spinner"></div>Cargando…</div>
+  <button class="btn" id="animeLoadMore" style="display:none;margin:16px auto;display:block;width:200px;" onclick="animeNextPage()">CARGAR MÁS</button>
+</div>
+
+<!-- DOCS SECTION -->
+<div class="section" id="docsSection">
+  <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;" id="docsTabs">
+    <button class="src-btn active" onclick="loadDocs('popular',this)">🔥 Populares</button>
+    <button class="src-btn" onclick="loadDocs('top_rated',this)">⭐ Mejor valorados</button>
+  </div>
+  <div class="content-grid" id="docsGrid"></div>
+  <div class="loading" id="docsLoading" style="display:none;"><div class="spinner"></div>Cargando…</div>
+  <button class="btn" id="docsLoadMore" style="display:none;margin:16px auto;display:block;width:200px;" onclick="docsNextPage()">CARGAR MÁS</button>
+</div>
+
+<!-- MODAL -->
+<div class="modal-bg" id="modalBg" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-title" id="modalTitle"></div>
+    <div class="modal-sub" id="modalSub"></div>
+    <div class="modal-desc" id="modalDesc"></div>
+    <div class="modal-selectors" id="modalSelectors"></div>
+    <button class="btn btn-accent" id="modalPlayBtn" onclick="playFromModal()" style="width:100%;padding:12px;font-size:16px;">▶ VER AHORA</button>
+  </div>
+</div>
+
+<footer>lacrimosa.xyz · Datos de TMDB · TV Lite — optimizado para Smart TV</footer>
+
+<noscript>
+  <div style="text-align:center;padding:60px 20px;color:#fff;background:#0a0a0f;font-family:Arial,sans-serif;">
+    <h2>⚠️ JavaScript desactivado</h2>
+    <p>Esta página requiere JavaScript para funcionar. Actívalo en la configuración de tu navegador.</p>
+  </div>
+</noscript>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  TV LITE — JS ultra-ligero
+// ═══════════════════════════════════════════════════════
+var TMDB_KEY = '8265bd1679663a7ea12ac168da84d2e8';
+var TMDB_BASE = 'https://api.themoviedb.org/3';
+var TMDB_IMG = 'https://image.tmdb.org/t/p/';
+function img(size, path) { return path ? TMDB_IMG + size + path + '?format=webp' : ''; }
+
+// Embedders
+var SERIES_SOURCES = [
+  { label:'UnlimPlay',  fn:function(id,s,e){return 'https://unlimplay.com/play/embed/tv/'+id+'/'+s+'/'+e} },
+  { label:'UnLim F',    fn:function(id,s,e){return 'https://unlimplay.com/f/embed/tv/'+id+'/'+s+'/'+e}, noLang:true },
+  { label:'VidSrc RU',   fn:function(id,s,e){return 'https://vsembed.ru/embed/tv/'+id+'/'+s+'/'+e} },
+  { label:'VidSrc SU',   fn:function(id,s,e){return 'https://vidsrc-embed.su/embed/tv/'+id+'/'+s+'/'+e} },
+  { label:'VidSrcMe SU', fn:function(id,s,e){return 'https://vidsrcme.su/embed/tv/'+id+'/'+s+'/'+e} },
+  { label:'VSrc SU',     fn:function(id,s,e){return 'https://vsrc.su/embed/tv/'+id+'/'+s+'/'+e} },
+];
+var MOVIE_SOURCES = [
+  { label:'UnlimPlay',  fn:function(id){return 'https://unlimplay.com/play/embed/movie/'+id} },
+  { label:'VidSrc SU',   fn:function(id){return 'https://vidsrc-embed.su/embed/movie/'+id} },
+  { label:'VidSrcMe SU', fn:function(id){return 'https://vidsrcme.su/embed/movie/'+id} },
+  { label:'VSrc SU',     fn:function(id){return 'https://vsrc.su/embed/movie/'+id} },
+  { label:'VidSrc RU',   fn:function(id){return 'https://vsembed.ru/embed/movie/'+id} },
+];
+
+// State
+var currentCat = 'series';
+var mediaType = 'tv'; // 'tv' | 'movie'
+var mediaLang = 'es';
+var mediaCurSrc = 0;
+var currentSeries = null;
+var currentMovie = null;
+var seriesSeasons = [];
+var currentSeasonNum = 1;
+var episodesCache = {};
+
+// Pagination
+var seriesPage=1, seriesLastCat='popular', seriesLastQ='';
+var moviesPage=1, moviesLastCat='popular', moviesLastQ='';
+var animePage=1, animeLastCat='popular', animeLastQ='';
+var docsPage=1, docsLastCat='popular', docsLastQ='';
+
+// ── CATEGORY SWITCHING ──────────────────────────────────
+function switchCategory(cat) {
+  currentCat = cat;
+  document.querySelectorAll('.cat-tab').forEach(function(t){ t.classList.toggle('active', t.dataset.cat===cat); });
+  ['seriesSection','moviesSection','animeSection','docsSection'].forEach(function(id){
+    document.getElementById(id).classList.toggle('visible', id===cat+'Section');
+  });
+  document.getElementById('headerBadge').textContent =
+    cat==='series'?'📺 Series · TV Lite':
+    cat==='movies'?'🎬 Películas · TV Lite':
+    cat==='anime'?'🌸 Anime · TV Lite':'🎥 Docs · TV Lite';
+}
+
+document.querySelectorAll('.cat-tab').forEach(function(tab){
+  tab.addEventListener('click', function(){ switchCategory(this.dataset.cat); });
+});
+
+// ── SERIES ──────────────────────────────────────────────
+async function loadSeries(cat, btn) {
+  document.querySelectorAll('#seriesTabs .src-btn').forEach(function(b){ b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  seriesLastCat=cat; seriesLastQ=''; seriesPage=1;
+  fetchSeries(true);
+}
+
+async function fetchSeries(reset) {
+  var grid = document.getElementById('seriesGrid');
+  if (reset) { grid.innerHTML = ''; document.getElementById('seriesLoadMore').style.display = 'none'; }
+  document.getElementById('seriesLoading').style.display = 'flex';
+
+  var url;
+  if (seriesLastQ) {
+    url = TMDB_BASE+'/search/tv?api_key='+TMDB_KEY+'&query='+encodeURIComponent(seriesLastQ)+'&page='+seriesPage+'&language=es-MX';
+  } else {
+    url = TMDB_BASE+'/tv/'+seriesLastCat+'?api_key='+TMDB_KEY+'&page='+seriesPage+'&language=es-MX';
+  }
+
+  try {
+    var res = await fetch(url); var json = await res.json();
+    var data = json.results || [];
+    document.getElementById('seriesLoading').style.display = 'none';
+    if (!data.length && reset) { grid.innerHTML = '<div class="empty-state">Sin resultados</div>'; return; }
+
+    data.forEach(function(tv, i) {
+      var card = document.createElement('div');
+      card.className = 'card';
+      card.style.position = 'relative';
+      card.tabIndex = 0;
+      card.onclick = function(){ openModal(tv, 'tv'); };
+      var poster = tv.poster_path ? img('w342', tv.poster_path) : '';
+      var score = tv.vote_average ? tv.vote_average.toFixed(1) : '';
+      card.innerHTML =
+        (poster
+          ? '<img class="card-poster" src="'+poster+'" alt="'+tv.name+'" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><div class="card-poster-fb" style="display:none">📺</div>'
+          : '<div class="card-poster-fb">📺</div>') +
+        (score?'<div class="card-score">⭐ '+score+'</div>':'') +
+        '<div class="card-info"><div class="card-name">'+tv.name+'</div><div class="card-meta"><span>'+(tv.first_air_date||'').slice(0,4)+'</span><span>'+(tv.original_language||'').toUpperCase()+'</span></div></div>';
+      grid.appendChild(card);
+    });
+    document.getElementById('seriesLoadMore').style.display = (seriesPage < (json.total_pages||1)) ? 'block' : 'none';
+  } catch(e) {
+    document.getElementById('seriesLoading').style.display = 'none';
+    if (reset) grid.innerHTML = '<div class="empty-state">⚠️ Error de conexión</div>';
+  }
+}
+
+function seriesNextPage() { seriesPage++; fetchSeries(false); }
+
+// ── MOVIES ──────────────────────────────────────────────
+async function loadMovies(cat, btn) {
+  document.querySelectorAll('#moviesTabs .src-btn').forEach(function(b){ b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  moviesLastCat=cat; moviesLastQ=''; moviesPage=1;
+  fetchMovies(true);
+}
+
+async function fetchMovies(reset) {
+  var grid = document.getElementById('moviesGrid');
+  if (reset) { grid.innerHTML = ''; document.getElementById('moviesLoadMore').style.display = 'none'; }
+  document.getElementById('moviesLoading').style.display = 'flex';
+
+  var url;
+  if (moviesLastQ) {
+    url = TMDB_BASE+'/search/movie?api_key='+TMDB_KEY+'&query='+encodeURIComponent(moviesLastQ)+'&page='+moviesPage+'&language=es-MX';
+  } else {
+    url = TMDB_BASE+'/movie/'+moviesLastCat+'?api_key='+TMDB_KEY+'&page='+moviesPage+'&language=es-MX';
+  }
+
+  try {
+    var res = await fetch(url); var json = await res.json();
+    var data = json.results || [];
+    document.getElementById('moviesLoading').style.display = 'none';
+    if (!data.length && reset) { grid.innerHTML = '<div class="empty-state">Sin resultados</div>'; return; }
+
+    data.forEach(function(m, i) {
+      var card = document.createElement('div');
+      card.className = 'card';
+      card.style.position = 'relative';
+      card.tabIndex = 0;
+      card.onclick = function(){ openModal(m, 'movie'); };
+      var poster = m.poster_path ? img('w342', m.poster_path) : '';
+      var score = m.vote_average ? m.vote_average.toFixed(1) : '';
+      card.innerHTML =
+        (poster
+          ? '<img class="card-poster" src="'+poster+'" alt="'+m.title+'" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><div class="card-poster-fb" style="display:none">🎬</div>'
+          : '<div class="card-poster-fb">🎬</div>') +
+        (score?'<div class="card-score">⭐ '+score+'</div>':'') +
+        '<div class="card-info"><div class="card-name">'+m.title+'</div><div class="card-meta"><span>'+(m.release_date||'').slice(0,4)+'</span><span>'+(m.original_language||'').toUpperCase()+'</span></div></div>';
+      grid.appendChild(card);
+    });
+    document.getElementById('moviesLoadMore').style.display = (moviesPage < (json.total_pages||1)) ? 'block' : 'none';
+  } catch(e) {
+    document.getElementById('moviesLoading').style.display = 'none';
+    if (reset) grid.innerHTML = '<div class="empty-state">⚠️ Error de conexión</div>';
+  }
+}
+
+function moviesNextPage() { moviesPage++; fetchMovies(false); }
+
+// ── ANIME ───────────────────────────────────────────────
+async function loadAnime(cat, btn) {
+  document.querySelectorAll('#animeTabs .src-btn').forEach(function(b){ b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  animeLastCat=cat; animeLastQ=''; animePage=1;
+  fetchAnime(true);
+}
+
+async function fetchAnime(reset) {
+  var grid = document.getElementById('animeGrid');
+  if (reset) { grid.innerHTML = ''; document.getElementById('animeLoadMore').style.display = 'none'; }
+  document.getElementById('animeLoading').style.display = 'flex';
+
+  var url;
+  if (animeLastQ) {
+    url = TMDB_BASE+'/search/tv?api_key='+TMDB_KEY+'&query='+encodeURIComponent(animeLastQ)+'&page='+animePage+'&language=es-MX';
+  } else {
+    var sort = animeLastCat==='top_rated'?'vote_average.desc':'popularity.desc';
+    url = TMDB_BASE+'/discover/tv?api_key='+TMDB_KEY+'&language=es-MX&page='+animePage+'&with_genres=16&with_original_language=ja&sort_by='+sort+'&vote_count.gte=10';
+  }
+
+  try {
+    var res = await fetch(url); var json = await res.json();
+    var data = json.results || [];
+    document.getElementById('animeLoading').style.display = 'none';
+    if (!data.length && reset) { grid.innerHTML = '<div class="empty-state">Sin resultados</div>'; return; }
+
+    data.forEach(function(tv, i) {
+      var card = document.createElement('div');
+      card.className = 'card';
+      card.style.position = 'relative';
+      card.tabIndex = 0;
+      card.onclick = function(){ openModal(tv, 'tv'); };
+      var poster = tv.poster_path ? img('w342', tv.poster_path) : '';
+      var score = tv.vote_average ? tv.vote_average.toFixed(1) : '';
+      card.innerHTML =
+        (poster
+          ? '<img class="card-poster" src="'+poster+'" alt="'+tv.name+'" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><div class="card-poster-fb" style="display:none">🌸</div>'
+          : '<div class="card-poster-fb">🌸</div>') +
+        (score?'<div class="card-score">⭐ '+score+'</div>':'') +
+        '<div class="card-info"><div class="card-name">'+tv.name+'</div><div class="card-meta"><span>'+(tv.first_air_date||'').slice(0,4)+'</span><span>'+(tv.original_language||'').toUpperCase()+'</span></div></div>';
+      grid.appendChild(card);
+    });
+    document.getElementById('animeLoadMore').style.display = (animePage < (json.total_pages||1)) ? 'block' : 'none';
+  } catch(e) {
+    document.getElementById('animeLoading').style.display = 'none';
+    if (reset) grid.innerHTML = '<div class="empty-state">⚠️ Error de conexión</div>';
+  }
+}
+
+function animeNextPage() { animePage++; fetchAnime(false); }
+
+// ── DOCS ────────────────────────────────────────────────
+async function loadDocs(cat, btn) {
+  document.querySelectorAll('#docsTabs .src-btn').forEach(function(b){ b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  docsLastCat=cat; docsLastQ=''; docsPage=1;
+  fetchDocs(true);
+}
+
+async function fetchDocs(reset) {
+  var grid = document.getElementById('docsGrid');
+  if (reset) { grid.innerHTML = ''; document.getElementById('docsLoadMore').style.display = 'none'; }
+  document.getElementById('docsLoading').style.display = 'flex';
+
+  var url;
+  if (docsLastQ) {
+    url = TMDB_BASE+'/search/movie?api_key='+TMDB_KEY+'&query='+encodeURIComponent(docsLastQ)+'&page='+docsPage+'&language=es-MX';
+  } else {
+    var sort = docsLastCat==='top_rated'?'vote_average.desc':'popularity.desc';
+    url = TMDB_BASE+'/discover/movie?api_key='+TMDB_KEY+'&language=es-MX&page='+docsPage+'&with_genres=99&sort_by='+sort+'&vote_count.gte=5';
+  }
+
+  try {
+    var res = await fetch(url); var json = await res.json();
+    var data = json.results || [];
+    document.getElementById('docsLoading').style.display = 'none';
+    if (!data.length && reset) { grid.innerHTML = '<div class="empty-state">Sin resultados</div>'; return; }
+
+    data.forEach(function(m, i) {
+      var card = document.createElement('div');
+      card.className = 'card';
+      card.style.position = 'relative';
+      card.tabIndex = 0;
+      card.onclick = function(){ openModal(m, 'movie'); };
+      var poster = m.poster_path ? img('w342', m.poster_path) : '';
+      var score = m.vote_average ? m.vote_average.toFixed(1) : '';
+      card.innerHTML =
+        (poster
+          ? '<img class="card-poster" src="'+poster+'" alt="'+m.title+'" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><div class="card-poster-fb" style="display:none">🎥</div>'
+          : '<div class="card-poster-fb">🎥</div>') +
+        (score?'<div class="card-score">⭐ '+score+'</div>':'') +
+        '<div class="card-info"><div class="card-name">'+m.title+'</div><div class="card-meta"><span>'+(m.release_date||'').slice(0,4)+'</span><span>'+(m.original_language||'').toUpperCase()+'</span></div></div>';
+      grid.appendChild(card);
+    });
+    document.getElementById('docsLoadMore').style.display = (docsPage < (json.total_pages||1)) ? 'block' : 'none';
+  } catch(e) {
+    document.getElementById('docsLoading').style.display = 'none';
+    if (reset) grid.innerHTML = '<div class="empty-state">⚠️ Error de conexión</div>';
+  }
+}
+
+function docsNextPage() { docsPage++; fetchDocs(false); }
+
+// ── SEARCH ──────────────────────────────────────────────
+function doSearch() {
+  var q = document.getElementById('searchInput').value.trim();
+  if (!q) return;
+  if (currentCat === 'series') { seriesLastQ=q; seriesPage=1; fetchSeries(true); }
+  else if (currentCat === 'movies') { moviesLastQ=q; moviesPage=1; fetchMovies(true); }
+  else if (currentCat === 'anime') { animeLastQ=q; animePage=1; fetchAnime(true); }
+  else if (currentCat === 'docs') { docsLastQ=q; docsPage=1; fetchDocs(true); }
+}
+
+// ── MODAL ───────────────────────────────────────────────
+function openModal(item, type) {
+  var modalBg = document.getElementById('modalBg');
+  var title = document.getElementById('modalTitle');
+  var sub = document.getElementById('modalSub');
+  var desc = document.getElementById('modalDesc');
+  var selectors = document.getElementById('modalSelectors');
+  var playBtn = document.getElementById('modalPlayBtn');
+
+  if (type === 'tv') {
+    currentSeries = item; mediaType = 'tv';
+    title.textContent = item.name || '';
+    sub.textContent = [(item.first_air_date||'').slice(0,4), item.vote_average?'⭐ '+item.vote_average.toFixed(1):'', (item.original_language||'').toUpperCase()].filter(Boolean).join(' · ');
+    desc.textContent = (item.overview||'Sin descripción.').slice(0,350);
+
+    // Fetch full details for seasons
+    fetch(TMDB_BASE+'/tv/'+item.id+'?api_key='+TMDB_KEY+'&language=es-MX').then(function(r){ return r.json(); }).then(function(full){
+      currentSeries = full;
+      seriesSeasons = full.seasons || [{season_number:1,episode_count:10}];
+      var html = '<select class="modal-select" id="modalSeasonSel" onchange="updateModalEpisodes()">';
+      seriesSeasons.forEach(function(s){
+        if (s.season_number===0) return;
+        html += '<option value="'+s.season_number+'" data-eps="'+s.episode_count+'">Temporada '+s.season_number+'</option>';
+      });
+      html += '</select>';
+      html += '<select class="modal-select" id="modalEpSel"><option>Episodio 1</option></select>';
+      html += '<select class="modal-select" id="modalLangSel"><option value="es">Español Latino</option><option value="es-ES">Español España</option><option value="en">English</option><option value="org">Original</option></select>';
+      selectors.innerHTML = html;
+      updateModalEpisodes();
+    }).catch(function(){});
+
+    playBtn.textContent = '▶ VER AHORA';
+    playBtn.onclick = playFromModal;
+  } else {
+    currentMovie = item; mediaType = 'movie';
+    title.textContent = item.title || '';
+    sub.textContent = [(item.release_date||'').slice(0,4), item.vote_average?'⭐ '+item.vote_average.toFixed(1):'', (item.original_language||'').toUpperCase()].filter(Boolean).join(' · ');
+    desc.textContent = (item.overview||'Sin descripción.').slice(0,350);
+    selectors.innerHTML = '<select class="modal-select" id="modalLangSel"><option value="es">Español Latino</option><option value="es-ES">Español España</option><option value="en">English</option><option value="org">Original</option></select>';
+    playBtn.textContent = '▶ VER AHORA';
+    playBtn.onclick = playFromModal;
+  }
+
+  modalBg.classList.add('open');
+}
+
+function updateModalEpisodes() {
+  var sSel = document.getElementById('modalSeasonSel');
+  var eSel = document.getElementById('modalEpSel');
+  if (!sSel || !eSel) return;
+  var opt = sSel.options[sSel.selectedIndex];
+  var eps = parseInt(opt.dataset.eps || '10');
+  eSel.innerHTML = '';
+  for (var i=1;i<=eps;i++) {
+    var o = document.createElement('option'); o.value=i; o.textContent='Episodio '+i; eSel.appendChild(o);
+  }
+}
+
+function closeModal(e) {
+  if (e && e.target !== document.getElementById('modalBg')) return;
+  document.getElementById('modalBg').classList.remove('open');
+}
+
+function playFromModal() {
+  document.getElementById('modalBg').classList.remove('open');
+  mediaLang = (document.getElementById('modalLangSel')||{}).value || 'es';
+  document.getElementById('langSel').value = mediaLang;
+  mediaCurSrc = 0;
+
+  if (mediaType === 'tv' && currentSeries) {
+    var season = parseInt((document.getElementById('modalSeasonSel')||{}).value)||1;
+    var ep = parseInt((document.getElementById('modalEpSel')||{}).value)||1;
+    currentSeasonNum = season;
+    loadMediaEmbed(currentSeries.id, season, ep, 0);
+    renderEpisodes(season);
+  } else if (mediaType === 'movie' && currentMovie) {
+    loadMediaEmbed(currentMovie.id, 0, 0, 0);
+    document.getElementById('epSection').classList.remove('visible');
+  }
+}
+
+// ── PLAYER ──────────────────────────────────────────────
+var _loadToken = 0;
+
+function loadMediaEmbed(tmdbId, season, ep, srcIdx) {
+  mediaCurSrc = srcIdx;
+  _loadToken++;
+
+  var src = mediaType==='movie' ? MOVIE_SOURCES[srcIdx] : SERIES_SOURCES[srcIdx];
+  var url = mediaType==='movie' ? MOVIE_SOURCES[srcIdx].fn(tmdbId) : SERIES_SOURCES[srcIdx].fn(tmdbId, season, ep);
+
+  if (mediaLang && mediaLang !== 'org' && !src.noLang) {
+    url += (url.includes('?')?'&':'?') + 'lang=' + encodeURIComponent(mediaLang);
+  }
+
+  document.getElementById('playerTitle').textContent = mediaType==='movie' ? (currentMovie?.title||'Película') : (currentSeries?.name||'Serie');
+  document.getElementById('playerSub').textContent = mediaType==='movie' ? (currentMovie?.release_date?.slice(0,4)||'')+' · '+src.label : 'T'+season+' · EP'+ep+' · '+src.label;
+  document.getElementById('playerStatus').textContent = '⏳ CARGANDO';
+
+  var frame = document.getElementById('playerFrame');
+  var ph = document.getElementById('playerPlaceholder');
+  ph.style.display = 'flex';
+  frame.style.display = 'none';
+  frame.src = 'about:blank';
+
+  var token = _loadToken;
+  setTimeout(function(){
+    if (token !== _loadToken) return;
+    if (!document.getElementById('playerSection').classList.contains('visible')) return;
+    frame.src = url;
+    frame.style.display = 'block';
+    ph.style.display = 'none';
+    document.getElementById('playerStatus').textContent = '▶ '+src.label.toUpperCase();
+  }, 300);
+
+  document.getElementById('playerSection').classList.add('visible');
+  document.getElementById('playerSection').scrollIntoView({behavior:'instant',block:'start'});
+
+  // Source buttons
+  var sources = mediaType==='movie' ? MOVIE_SOURCES : SERIES_SOURCES;
+  var btnsHTML = '';
+  sources.forEach(function(s, i){
+    btnsHTML += '<button class="src-btn'+(i===srcIdx?' active':'')+'" onclick="switchSrc('+i+')">'+s.label+'</button>';
+  });
+  document.getElementById('srcBtns').innerHTML = btnsHTML;
+
+  // Next episode (solo TV)
+  if (mediaType === 'tv') {
+    setTimeout(function(){ updateNextEpUI(season, ep); }, 600);
+  } else {
+    hideNextEpUI();
+  }
+}
+
+function switchSrc(idx) {
+  mediaCurSrc = idx;
+  var season = mediaType==='tv' ? currentSeasonNum : 0;
+  var ep = mediaType==='tv' ? (parseInt(document.getElementById('modalEpSel')?.value)||1) : 0;
+  var id = mediaType==='movie' ? (currentMovie?.id) : (currentSeries?.id);
+  loadMediaEmbed(id, season, ep, idx);
+}
+
+function switchLang() {
+  mediaLang = document.getElementById('langSel').value;
+  var langSel = document.getElementById('modalLangSel');
+  if (langSel) langSel.value = mediaLang;
+  switchSrc(mediaCurSrc);
+}
+
+function closePlayer() {
+  _loadToken++;
+  cancelNextEp();
+  var frame = document.getElementById('playerFrame');
+  frame.removeAttribute('src');
+  frame.style.display = 'none';
+  document.getElementById('playerPlaceholder').style.display = 'flex';
+  document.getElementById('playerSection').classList.remove('visible');
+  document.getElementById('epSection').classList.remove('visible');
+  hideNextEpUI();
+}
+
+// ── EPISODES ────────────────────────────────────────────
+async function fetchEpisodes(seriesId, seasonNum) {
+  var key = seriesId+'_'+seasonNum;
+  if (episodesCache[key]) return episodesCache[key];
+  try {
+    var res = await fetch(TMDB_BASE+'/tv/'+seriesId+'/season/'+seasonNum+'?api_key='+TMDB_KEY+'&language=es-MX');
+    var data = await res.json();
+    episodesCache[key] = data.episodes || [];
+    return episodesCache[key];
+  } catch(e) { return []; }
+}
+
+async function renderEpisodes(seasonNum) {
+  if (!currentSeries) return;
+  var section = document.getElementById('epSection');
+  var grid = document.getElementById('epGrid');
+  var tabs = document.getElementById('seasonTabs');
+
+  tabs.innerHTML = '';
+  (seriesSeasons||[]).forEach(function(s){
+    if (s.season_number===0) return;
+    var tab = document.createElement('button');
+    tab.className = 'season-tab' + (s.season_number===seasonNum?' active':'');
+    tab.textContent = 'T'+s.season_number;
+    tab.onclick = function(){ renderEpisodes(s.season_number); };
+    tabs.appendChild(tab);
+  });
+
+  grid.innerHTML = '<div class="loading"><div class="spinner"></div>Cargando episodios…</div>';
+  section.classList.add('visible');
+
+  var episodes = await fetchEpisodes(currentSeries.id, seasonNum);
+  var currentEp = (mediaType==='tv' && seasonNum===currentSeasonNum) ? (parseInt(document.getElementById('modalEpSel')?.value)||1) : null;
+
+  grid.innerHTML = '';
+  if (!episodes.length) { grid.innerHTML = '<div class="empty-state">Sin información de episodios</div>'; return; }
+
+  episodes.forEach(function(ep, i){
+    var card = document.createElement('div');
+    card.className = 'ep-card' + (ep.episode_number===currentEp && seasonNum===currentSeasonNum?' active':'');
+    card.tabIndex = 0;
+    card.onclick = function(){ selectEpisode(seasonNum, ep.episode_number); };
+    var still = ep.still_path ? '<img class="ep-still" src="'+img('w300',ep.still_path)+'" alt="" loading="lazy">' : '<div class="ep-still" style="display:flex;align-items:center;justify-content:center;font-size:24px;">📺</div>';
+    card.innerHTML = still +
+      '<div class="ep-body"><div class="ep-num">EPISODIO '+ep.episode_number+'</div><div class="ep-name">'+(ep.name||'Episodio '+ep.episode_number)+'</div><div class="ep-meta">'+[ep.runtime?ep.runtime+' min':'', ep.vote_average?'⭐ '+ep.vote_average.toFixed(1):''].filter(Boolean).join(' · ')+'</div></div>';
+    grid.appendChild(card);
+  });
+}
+
+function selectEpisode(seasonNum, epNum) {
+  if (!currentSeries) return;
+  currentSeasonNum = seasonNum;
+  loadMediaEmbed(currentSeries.id, seasonNum, epNum, mediaCurSrc);
+  renderEpisodes(seasonNum);
+  document.getElementById('playerSection').scrollIntoView({behavior:'instant',block:'start'});
+  cancelNextEp();
+  setTimeout(function(){ updateNextEpUI(seasonNum, epNum); }, 600);
+}
+
+// ── NEXT EPISODE ────────────────────────────────────────
+var _nextEpData = null;
+var _nextEpTimer = null;
+var _nextEpCountdown = 10;
+var _nextEpActive = false;
+
+async function getNextEpInfo(season, ep) {
+  if (!currentSeries) return null;
+  var episodes = await fetchEpisodes(currentSeries.id, season);
+  if (episodes && episodes.length > 0) {
+    for (var i=0; i<episodes.length; i++) {
+      if (episodes[i].episode_number===ep && i+1 < episodes.length) {
+        var n = episodes[i+1];
+        return { seasonNum:season, epNum:n.episode_number, stillPath:n.still_path, name:n.name||('Episodio '+n.episode_number), runtime:n.runtime, airDate:n.air_date };
+      }
+    }
+  }
+  // Siguiente temporada
+  var validSeasons = (seriesSeasons||[]).filter(function(s){ return s.season_number>0; });
+  for (var j=0; j<validSeasons.length; j++) {
+    if (validSeasons[j].season_number===season && j+1 < validSeasons.length) {
+      var ns = validSeasons[j+1].season_number;
+      var nse = await fetchEpisodes(currentSeries.id, ns);
+      if (nse && nse.length>0) {
+        return { seasonNum:ns, epNum:nse[0].episode_number||1, stillPath:nse[0].still_path, name:nse[0].name||('Episodio '+nse[0].episode_number), runtime:nse[0].runtime, airDate:nse[0].air_date };
+      }
+    }
+  }
+  return null;
+}
+
+async function updateNextEpUI(season, ep) {
+  if (!currentSeries || mediaType!=='tv') { hideNextEpUI(); return; }
+  var next = await getNextEpInfo(season, ep);
+  _nextEpData = next;
+  if (!next) { hideNextEpUI(); return; }
+
+  document.getElementById('nextEpTriggerName').textContent = 'T'+next.seasonNum+' EP'+next.epNum+' · '+next.name;
+  document.getElementById('nextEpTrigger').classList.add('visible');
+
+  document.getElementById('nextEpLabel').textContent = 'T'+next.seasonNum+' · EP'+next.epNum;
+  document.getElementById('nextEpName').textContent = next.name;
+  document.getElementById('nextEpMeta').textContent = [next.runtime?next.runtime+' min':'', next.airDate||''].filter(Boolean).join(' · ');
+  var still = document.getElementById('nextEpStill');
+  if (next.stillPath) { still.src = img('w300', next.stillPath); still.style.display = ''; }
+  else { still.style.display = 'none'; }
+}
+
+function startNextEpCountdown() {
+  if (!_nextEpData || _nextEpActive) return;
+  _nextEpActive = true;
+  _nextEpCountdown = 10;
+  document.getElementById('nextEpCountdown').textContent = '10';
+  document.getElementById('nextEpOverlay').classList.add('visible');
+  document.getElementById('nextEpTrigger').classList.remove('visible');
+
+  if (_nextEpTimer) clearInterval(_nextEpTimer);
+  _nextEpTimer = setInterval(function(){
+    _nextEpCountdown--;
+    document.getElementById('nextEpCountdown').textContent = _nextEpCountdown;
+    if (_nextEpCountdown <= 0) {
+      clearInterval(_nextEpTimer); _nextEpTimer = null;
+      playNextEpNow();
+    }
+  }, 1000);
+}
+
+function playNextEpNow() {
+  if (_nextEpTimer) { clearInterval(_nextEpTimer); _nextEpTimer = null; }
+  if (!_nextEpData) { hideNextEpOverlay(); return; }
+  var next = _nextEpData;
+  _nextEpActive = false;
+  _nextEpData = null;
+  hideNextEpOverlay();
+  hideNextEpTrigger();
+  if (currentSeries) selectEpisode(next.seasonNum, next.epNum);
+}
+
+function cancelNextEp() {
+  if (_nextEpTimer) { clearInterval(_nextEpTimer); _nextEpTimer = null; }
+  _nextEpActive = false;
+  hideNextEpOverlay();
+  if (_nextEpData) document.getElementById('nextEpTrigger').classList.add('visible');
+}
+
+function hideNextEpOverlay() { document.getElementById('nextEpOverlay').classList.remove('visible'); }
+function hideNextEpTrigger() { document.getElementById('nextEpTrigger').classList.remove('visible'); }
+function hideNextEpUI() { hideNextEpOverlay(); hideNextEpTrigger(); _nextEpData = null; }
+
+// ── INIT ────────────────────────────────────────────────
+function showMainView() {
+  closePlayer();
+  document.getElementById('playerSection').classList.remove('visible');
+  document.getElementById('epSection').classList.remove('visible');
+  switchCategory(currentCat);
+}
+
+// Arrancar cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', function() {
+  try {
+    switchCategory('series');
+    var firstTab = document.querySelector('#seriesTabs .src-btn');
+    if (firstTab) loadSeries('popular', firstTab);
+    else loadSeries('popular', null);
+  } catch(e) {
+    console.error('Error al iniciar:', e);
+    document.getElementById('seriesGrid').innerHTML = '<div class="empty-state">⚠️ Error al cargar. Recarga la página.</div>';
+  }
+});
+
+// Keyboard shortcuts for TV remote
+document.addEventListener('keydown', function(e){
+  if (e.key === 'Escape') {
+    if (document.getElementById('modalBg').classList.contains('open')) {
+      document.getElementById('modalBg').classList.remove('open');
+    } else if (document.getElementById('playerSection').classList.contains('visible')) {
+      closePlayer();
+    }
+  }
+  // Backspace/GoBack for TV remote
+  if (e.key === 'GoBack' || e.key === 'Backspace' || e.keyCode === 461) {
+    e.preventDefault();
+    if (document.getElementById('modalBg').classList.contains('open')) {
+      document.getElementById('modalBg').classList.remove('open');
+    } else {
+      showMainView();
+    }
+  }
+});
+</script>
+</body>
+</html>
